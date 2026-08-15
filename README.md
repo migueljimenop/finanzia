@@ -85,14 +85,39 @@ configurados, seed y CI de lint/build.
 - Cálculo de margen de gasto disponible (mensual y prorrateado a hoy)
 - Dashboard consolidado (`/`)
 
+### Etapa 2 — Carga de movimientos ✅
+- CRUD manual de movimientos (`/movimientos`): gasto, ingreso o
+  transferencia, con categoría filtrada según el tipo elegido
+- Importador de CSV, XLS y XLSX (`/movimientos/importar`) con **parsers
+  específicos por banco** ([`src/lib/bank-parsers/`](src/lib/bank-parsers)),
+  probados contra cartolas reales:
+  - **Santander** (cuenta corriente / débito): columnas "Monto cargo" /
+    "Monto abono" → gasto / ingreso
+  - **Banco de Chile** (cuenta vista / FAN): mismo esquema cargo/abono;
+    el parser ignora las filas de metadata (titular, RUT, saldos) que el
+    banco pone antes de la tabla real
+  - **Falabella** (tarjeta de crédito, sin cuenta corriente): columna
+    "MONTO" siempre positiva; las filas "PAGO TARJETA CMR" se clasifican
+    como transferencia (abono a la tarjeta, no gasto propio), el resto
+    como gasto — así el seguimiento de "la tarjeta que trato de no usar"
+    refleja solo compras reales
+  - Si el archivo no calza con ninguno de los tres formatos, cae a un
+    **mapeo manual** de columnas (fecha/monto/descripción) para CSVs
+    genéricos, igual que antes
+  - La cuenta destino se preselecciona según el banco detectado
+- Los movimientos importados o manuales alimentan directamente el cálculo
+  de margen de la Etapa 1
+- El parser XLSX (`xlsx`/SheetJS) se instaló desde el CDN oficial de
+  SheetJS en vez de npm — la versión publicada en el registro npm
+  (0.18.5) tiene CVEs sin parchear ahí; SheetJS solo publica versiones
+  parchadas en su propio CDN
+
 ### Falta para las próximas etapas
-- **Etapa 2 — Movimientos**: registro manual de gastos y categorización
-  desde la UI (el modelo `Transaction` ya existe y ya alimenta el cálculo
-  de margen; falta el CRUD), más importación de cartolas CSV/Excel por
-  banco.
 - **Etapa 3 — Reportes**: vistas por banco, tarjeta y categoría, mensual y
-  comparativo.
+  comparativo
 - **Etapa 4 — Forecast y alertas**: proyección de cierre de mes y alertas
-  de gasto hormiga cuando el acumulado se desvía del promedio histórico.
+  de gasto hormiga cuando el acumulado se desvía del promedio histórico
 - Gestión de reglas de distribución desde la UI (hoy solo existe la regla
-  sembrada por el seed; para cambiarla hay que editar la base directamente).
+  sembrada por el seed; para cambiarla hay que editar la base directamente)
+- Categorización automática de movimientos importados (hoy queda "sin
+  categoría" salvo que elijas una para todo el lote al importar)

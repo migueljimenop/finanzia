@@ -17,6 +17,9 @@ importers:
       next:
         specifier: 16.3.1
         version: 16.3.1(@babel/core@7.29.7)(@types/node@22.20.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      papaparse:
+        specifier: ^5.6.0
+        version: 5.6.0
       pg:
         specifier: ^8.23.0
         version: 8.23.0
@@ -26,6 +29,9 @@ importers:
       react-dom:
         specifier: 19.2.8
         version: 19.2.8(react@19.2.8)
+      xlsx:
+        specifier: https://cdn.sheetjs.com/xlsx-latest/xlsx-latest.tgz
+        version: https://cdn.sheetjs.com/xlsx-latest/xlsx-latest.tgz
       zod:
         specifier: ^4.4.3
         version: 4.4.3
@@ -36,6 +42,9 @@ importers:
       '@types/node':
         specifier: ^22.20.1
         version: 22.20.1
+      '@types/papaparse':
+        specifier: ^5.5.2
+        version: 5.5.2
       '@types/pg':
         specifier: ^8.21.0
         version: 8.21.0
@@ -912,6 +921,9 @@ packages:
 
   '@types/node@22.20.1':
     resolution: {integrity: sha512-EANqOCF9QFyra+4pfxUcX9STKJpCLjMbObVzljIJomAWSnuSIEAvyzEU53GaajbXJEgdh0iEcPL+DGvpUd4k1Q==}
+
+  '@types/papaparse@5.5.2':
+    resolution: {integrity: sha512-gFnFp/JMzLHCwRf7tQHrNnfhN4eYBVYYI897CGX4MY1tzY9l2aLkVyx2IlKZ/SAqDbB3I1AOZW5gTMGGsqWliA==}
 
   '@types/pg@8.21.0':
     resolution: {integrity: sha512-AYdtudzabjLZgVgRZmAnU8bAnVUXzuJX2IYHeSIiIHm68olD+LgQYCGWdtcNYnP0uq9c4S4NibVG3Ni7VbKW7Q==}
@@ -2234,6 +2246,9 @@ packages:
     resolution: {integrity: sha512-LaNjtRWUBY++zB5nE/NwcaoMylSPk+S+ZHNB1TzdbMJMny6dynpAGt7X/tl/QYq3TIeE6nxHppbo2LGymrG5Pw==}
     engines: {node: '>=10'}
 
+  papaparse@5.6.0:
+    resolution: {integrity: sha512-N2vuNQAYGK1/4vs6HJX86+VYU6OkiSTgdJz3JQfTk1y51cFCO/U8gnaeTF4iNE4r57Tt0sV47dUua1/19pxO6Q==}
+
   parent-module@1.0.1:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
     engines: {node: '>=6'}
@@ -2711,6 +2726,12 @@ packages:
   word-wrap@1.2.5:
     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
     engines: {node: '>=0.10.0'}
+
+  xlsx@https://cdn.sheetjs.com/xlsx-latest/xlsx-latest.tgz:
+    resolution: {tarball: https://cdn.sheetjs.com/xlsx-latest/xlsx-latest.tgz}
+    version: 0.20.3
+    engines: {node: '>=0.8'}
+    hasBin: true
 
   xtend@4.0.2:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
@@ -3486,6 +3507,10 @@ snapshots:
   '@types/node@22.20.1':
     dependencies:
       undici-types: 6.21.0
+
+  '@types/papaparse@5.5.2':
+    dependencies:
+      '@types/node': 22.20.1
 
   '@types/pg@8.21.0':
     dependencies:
@@ -5030,6 +5055,8 @@ snapshots:
     dependencies:
       p-limit: 3.1.0
 
+  papaparse@5.6.0: {}
+
   parent-module@1.0.1:
     dependencies:
       callsites: 3.1.0
@@ -5609,6 +5636,8 @@ snapshots:
       isexe: 2.0.0
 
   word-wrap@1.2.5: {}
+
+  xlsx@https://cdn.sheetjs.com/xlsx-latest/xlsx-latest.tgz: {}
 
   xtend@4.0.2: {}
 
