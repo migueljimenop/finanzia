@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Bank {
+  SANTANDER
+  FALABELLA
+  MERCADO_PAGO
+  BANCO_CHILE
+}
+
+enum AccountType {
+  DEBIT
+  CREDIT
+}
+
+enum BucketType {
+  INVESTMENT
+  HOME_TRANSFER
+  CREDIT_INSTALLMENT
+  AVAILABLE_MARGIN
+}
+
+enum CalcMethod {
+  PERCENTAGE
+  FIXED_AMOUNT
+  REMAINDER
+}
+
+enum TxType {
+  EXPENSE
+  INCOME
+  TRANSFER
+}
+
+enum TxSource {
+  MANUAL
+  IMPORT
+}
+
+model Account {
+  id        String   @id @default(cuid())
+  name      String
+  bank      Bank
+  type      AccountType
+  balance   Decimal     @default(0) @db.Decimal(14, 2)
+  currency  String      @default("CLP")
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  transactions Transaction[]
+  incomes      Income[]
+}
+
+model Category {
+  id       String @id @default(cuid())
+  name     String @unique
+  kind     TxType
+  isSystem Boolean @default(false)
+
+  transactions Transaction[]
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  accountId   String
+  account     Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  date        DateTime
+  amount      Decimal  @db.Decimal(14, 2)
+  description String?
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
+  type        TxType
+  source      TxSource @default(MANUAL)
+  createdAt   DateTime @default(now())
+
+  @@index([accountId, date])
+}
+
+model DistributionRule {
+  id        String   @id @default(cuid())
+  name      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  buckets DistributionBucket[]
+  incomes Income[]
+}
+
+model DistributionBucket {
+  id              String     @id @default(cuid())
+  ruleId          String
+  rule            DistributionRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  type            BucketType
+  calcMethod      CalcMethod
+  value           Decimal?   @db.Decimal(14, 2)
+  targetAccountId String?
+  order           Int
+
+  distributions IncomeDistribution[]
+}
+
+model Income {
+  id          String   @id @default(cuid())
+  accountId   String
+  account     Account  @relation(fields: [accountId], references: [id])
+  date        DateTime
+  amount      Decimal  @db.Decimal(14, 2)
+  description String?
+  ruleId      String
+  rule        DistributionRule @relation(fields: [ruleId], references: [id])
+  createdAt   DateTime @default(now())
+
+  distributions IncomeDistribution[]
+}
+
+model IncomeDistribution {
+  id       String   @id @default(cuid())
+  incomeId String
+  income   Income   @relation(fields: [incomeId], references: [id], onDelete: Cascade)
+  bucketId String
+  bucket   DistributionBucket @relation(fields: [bucketId], references: [id])
+  type     BucketType
+  amount   Decimal  @db.Decimal(14, 2)
+
+  @@index([incomeId])
+}
