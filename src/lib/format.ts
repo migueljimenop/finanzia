@@ -32,3 +32,14 @@ export const CALC_METHOD_LABELS: Record<string, string> = {
   FIXED_AMOUNT: "Monto fijo",
   REMAINDER: "Resto",
 };
+
+export const TX_TYPE_LABELS: Record<string, string> = {
+  EXPENSE: "Gasto",
+  INCOME: "Ingreso",
+  TRANSFER: "Transferencia",
+};
+
+export const TX_SOURCE_LABELS: Record<string, string> = {
+  MANUAL: "Manual",
+  IMPORT: "Importado",
+};
