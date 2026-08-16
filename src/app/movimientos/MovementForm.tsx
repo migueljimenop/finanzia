@@ -27,15 +27,15 @@ export function MovementForm({ action, accounts, categories, defaultValues, subm
   const filteredCategories = categories.filter((c) => c.kind === type);
 
   return (
-    <form action={action} className="flex flex-col gap-4 max-w-sm">
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Tipo</span>
+    <form action={action} className="flex flex-col gap-5 max-w-sm">
+      <label className="flex flex-col gap-1.5">
+        <span className="field-label">Tipo</span>
         <select
           name="type"
           required
           value={type}
           onChange={(e) => setType(e.target.value as TxType)}
-          className="border rounded px-3 py-2"
+          className="field-control"
         >
           {Object.values(TxType).map((t) => (
             <option key={t} value={t}>
@@ -45,14 +45,9 @@ export function MovementForm({ action, accounts, categories, defaultValues, subm
         </select>
       </label>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Cuenta</span>
-        <select
-          name="accountId"
-          required
-          defaultValue={defaultValues?.accountId}
-          className="border rounded px-3 py-2"
-        >
+      <label className="flex flex-col gap-1.5">
+        <span className="field-label">Cuenta</span>
+        <select name="accountId" required defaultValue={defaultValues?.accountId} className="field-control">
           {accounts.map((account) => (
             <option key={account.id} value={account.id}>
               {accountLabel(account)}
@@ -61,13 +56,9 @@ export function MovementForm({ action, accounts, categories, defaultValues, subm
         </select>
       </label>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Categoría</span>
-        <select
-          name="categoryId"
-          defaultValue={defaultValues?.categoryId ?? ""}
-          className="border rounded px-3 py-2"
-        >
+      <label className="flex flex-col gap-1.5">
+        <span className="field-label">Categoría</span>
+        <select name="categoryId" defaultValue={defaultValues?.categoryId ?? ""} className="field-control">
           <option value="">Sin categoría</option>
           {filteredCategories.map((category) => (
             <option key={category.id} value={category.id}>
@@ -77,43 +68,40 @@ export function MovementForm({ action, accounts, categories, defaultValues, subm
         </select>
       </label>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Fecha</span>
+      <label className="flex flex-col gap-1.5">
+        <span className="field-label">Fecha</span>
         <input
           name="date"
           type="date"
           required
           defaultValue={defaultValues?.date ?? new Date().toISOString().slice(0, 10)}
-          className="border rounded px-3 py-2"
+          className="field-control"
         />
       </label>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Monto (CLP)</span>
+      <label className="flex flex-col gap-1.5">
+        <span className="field-label">Monto (CLP)</span>
         <input
           name="amount"
           type="number"
           step="1"
           required
           defaultValue={defaultValues?.amount}
-          className="border rounded px-3 py-2"
+          className="field-control"
         />
       </label>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Descripción (opcional)</span>
+      <label className="flex flex-col gap-1.5">
+        <span className="field-label">Descripción (opcional)</span>
         <input
           name="description"
           type="text"
           defaultValue={defaultValues?.description}
-          className="border rounded px-3 py-2"
+          className="field-control"
         />
       </label>
 
-      <button
-        type="submit"
-        className="bg-black text-white rounded px-4 py-2 hover:bg-neutral-800"
-      >
+      <button type="submit" className="btn btn-primary w-fit">
         {submitLabel}
       </button>
     </form>

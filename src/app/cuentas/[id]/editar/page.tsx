@@ -19,10 +19,10 @@ export default async function EditarCuentaPage({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <Link href="/cuentas" className="text-sm text-neutral-500 hover:underline">
+        <Link href="/cuentas" className="link-quiet">
           ← Volver a cuentas
         </Link>
-        <h1 className="text-2xl font-semibold mt-2">Editar cuenta</h1>
+        <h1 className="text-2xl font-semibold tracking-tight mt-2">Editar cuenta</h1>
       </div>
 
       <AccountForm

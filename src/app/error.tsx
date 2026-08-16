@@ -11,26 +11,21 @@ export default function ErrorPage({
 }) {
   return (
     <div className="flex flex-col items-center gap-4 text-center py-16">
-      <h1 className="text-xl font-semibold">Algo salió mal</h1>
-      <p className="text-sm text-neutral-500 max-w-md">
+      <h1 className="text-xl font-semibold tracking-tight">Algo salió mal</h1>
+      <p className="text-sm text-foreground-muted max-w-md">
         Hubo un error al cargar esta página. Intenta de nuevo y, si persiste, revisa que la
         base de datos esté disponible.
       </p>
       {error.message && (
-        <p className="text-xs text-red-600 font-mono break-all max-w-md">{error.message}</p>
+        <p className="text-xs text-[var(--status-critical)] font-mono break-all max-w-md">
+          {error.message}
+        </p>
       )}
       <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={reset}
-          className="bg-black text-white rounded px-4 py-2 text-sm hover:bg-neutral-800"
-        >
+        <button type="button" onClick={reset} className="btn btn-primary">
           Reintentar
         </button>
-        <Link
-          href="/"
-          className="border rounded px-4 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-900"
-        >
+        <Link href="/" className="btn btn-secondary">
           Volver al inicio
         </Link>
       </div>

@@ -150,9 +150,9 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-4 max-w-sm">
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Archivo (CSV, XLS o XLSX)</span>
+      <div className="surface-card p-5 flex flex-col gap-4 max-w-sm">
+        <label className="flex flex-col gap-1.5">
+          <span className="field-label">Archivo (CSV, XLS o XLSX)</span>
           <input
             type="file"
             accept=".csv,.xls,.xlsx,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -160,17 +160,13 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
               const file = e.target.files?.[0];
               if (file) handleFile(file);
             }}
-            className="border rounded px-3 py-2"
+            className="field-control file:mr-3 file:rounded-md file:border-0 file:bg-foreground file:text-background file:px-3 file:py-1.5 file:text-sm file:font-medium"
           />
         </label>
 
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Cuenta</span>
-          <select
-            value={accountId}
-            onChange={(e) => setAccountId(e.target.value)}
-            className="border rounded px-3 py-2"
-          >
+        <label className="flex flex-col gap-1.5">
+          <span className="field-label">Cuenta</span>
+          <select value={accountId} onChange={(e) => setAccountId(e.target.value)} className="field-control">
             {accounts.map((account) => (
               <option key={account.id} value={account.id}>
                 {accountLabel(account)}
@@ -180,15 +176,15 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
         </label>
 
         {!bankResult && (
-          <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium">Tipo (se aplica a todas las filas)</span>
+          <label className="flex flex-col gap-1.5">
+            <span className="field-label">Tipo (se aplica a todas las filas)</span>
             <select
               value={type}
               onChange={(e) => {
                 setType(e.target.value as TxType);
                 setCategoryId("");
               }}
-              className="border rounded px-3 py-2"
+              className="field-control"
             >
               {Object.values(TxType).map((t) => (
                 <option key={t} value={t}>
@@ -199,13 +195,9 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
           </label>
         )}
 
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium">Categoría (opcional, se aplica a todas las filas)</span>
-          <select
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-            className="border rounded px-3 py-2"
-          >
+        <label className="flex flex-col gap-1.5">
+          <span className="field-label">Categoría (opcional, se aplica a todas las filas)</span>
+          <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} className="field-control">
             <option value="">Sin categoría</option>
             {(bankResult ? categories : filteredCategories).map((category) => (
               <option key={category.id} value={category.id}>
@@ -216,16 +208,16 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
         </label>
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-[var(--status-critical)]">{error}</p>}
 
       {bankResult && (
-        <div className="flex flex-col gap-1">
-          <p className="text-sm text-green-700 dark:text-green-500">
-            Formato reconocido: {bankResult.bankLabel}. Fecha, monto y tipo (gasto,
-            ingreso o transferencia) de cada fila se detectaron automáticamente.
-          </p>
+        <div className="flex flex-col gap-2">
+          <span className="badge-good w-fit">
+            <span className="status-dot bg-current" />
+            Formato reconocido: {bankResult.bankLabel}
+          </span>
           {bankResult.accountNumber && (
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-foreground-muted">
               N° de cuenta detectado en el archivo: {bankResult.accountNumber}
               {!accounts.some(
                 (a) => a.bank === bankResult.bank && a.accountNumber === bankResult.accountNumber
@@ -238,13 +230,9 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
 
       {!bankResult && headers.length > 0 && (
         <div className="flex flex-col sm:flex-row gap-4">
-          <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium">Columna de fecha</span>
-            <select
-              value={dateCol}
-              onChange={(e) => setDateCol(e.target.value)}
-              className="border rounded px-3 py-2"
-            >
+          <label className="flex flex-col gap-1.5">
+            <span className="field-label">Columna de fecha</span>
+            <select value={dateCol} onChange={(e) => setDateCol(e.target.value)} className="field-control">
               {headers.map((h, i) => (
                 <option key={i} value={h}>
                   {h}
@@ -253,13 +241,9 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
             </select>
           </label>
 
-          <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium">Columna de monto</span>
-            <select
-              value={amountCol}
-              onChange={(e) => setAmountCol(e.target.value)}
-              className="border rounded px-3 py-2"
-            >
+          <label className="flex flex-col gap-1.5">
+            <span className="field-label">Columna de monto</span>
+            <select value={amountCol} onChange={(e) => setAmountCol(e.target.value)} className="field-control">
               {headers.map((h, i) => (
                 <option key={i} value={h}>
                   {h}
@@ -268,12 +252,12 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
             </select>
           </label>
 
-          <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium">Columna de descripción</span>
+          <label className="flex flex-col gap-1.5">
+            <span className="field-label">Columna de descripción</span>
             <select
               value={descriptionCol}
               onChange={(e) => setDescriptionCol(e.target.value)}
-              className="border rounded px-3 py-2"
+              className="field-control"
             >
               <option value="">Ninguna</option>
               {headers.map((h, i) => (
@@ -289,7 +273,7 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
       {(bankResult || headers.length > 0) && (
         <div className="flex flex-col gap-4">
           <div>
-            <h2 className="text-lg font-semibold mb-2">
+            <h2 className="text-base font-semibold tracking-tight mb-2">
               Previsualización ({readyCount} filas listas
               {!bankResult && invalidCount > 0
                 ? `, ${invalidCount} se omitirán por fecha o monto inválido`
@@ -299,36 +283,38 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
                 : ""}
               )
             </h2>
-            <div className="border rounded overflow-x-auto max-h-96 overflow-y-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-neutral-100 dark:bg-neutral-900 sticky top-0">
+            <div className="surface-card overflow-x-auto max-h-96 overflow-y-auto">
+              <table className="data-table">
+                <thead className="sticky top-0 bg-surface">
                   <tr>
-                    <th className="px-4 py-2">Fecha</th>
-                    <th className="px-4 py-2">Monto</th>
-                    <th className="px-4 py-2">Descripción</th>
-                    <th className="px-4 py-2">{bankResult ? "Tipo" : "Estado"}</th>
+                    <th>Fecha</th>
+                    <th>Monto</th>
+                    <th>Descripción</th>
+                    <th>{bankResult ? "Tipo" : "Estado"}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {bankResult
                     ? bankResult.movements.slice(0, 50).map((m, i) => (
-                        <tr key={i} className="border-t">
-                          <td className="px-4 py-2">{toDateInputValue(m.date)}</td>
-                          <td className="px-4 py-2">{m.amount}</td>
-                          <td className="px-4 py-2">{m.description || "—"}</td>
-                          <td className="px-4 py-2">{TX_TYPE_LABELS[m.type]}</td>
+                        <tr key={i}>
+                          <td className="whitespace-nowrap">{toDateInputValue(m.date)}</td>
+                          <td className="num whitespace-nowrap">{m.amount}</td>
+                          <td>{m.description || "—"}</td>
+                          <td className="whitespace-nowrap text-foreground-secondary">
+                            {TX_TYPE_LABELS[m.type]}
+                          </td>
                         </tr>
                       ))
                     : mappedRows.slice(0, 50).map((row, i) => (
-                        <tr key={i} className="border-t">
-                          <td className="px-4 py-2">{String(row.raw[dateColIndex] ?? "")}</td>
-                          <td className="px-4 py-2">{String(row.raw[amountColIndex] ?? "")}</td>
-                          <td className="px-4 py-2">{row.description || "—"}</td>
-                          <td className="px-4 py-2">
+                        <tr key={i}>
+                          <td className="whitespace-nowrap">{String(row.raw[dateColIndex] ?? "")}</td>
+                          <td className="num whitespace-nowrap">{String(row.raw[amountColIndex] ?? "")}</td>
+                          <td>{row.description || "—"}</td>
+                          <td className="whitespace-nowrap">
                             {row.date && row.amount !== null ? (
-                              <span className="text-green-600">OK</span>
+                              <span className="badge-good">OK</span>
                             ) : (
-                              <span className="text-red-600">Inválida</span>
+                              <span className="badge-critical">Inválida</span>
                             )}
                           </td>
                         </tr>
@@ -342,7 +328,7 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
             type="button"
             onClick={handleImport}
             disabled={isPending || readyCount === 0 || !accountId}
-            className="bg-black text-white rounded px-4 py-2 w-fit hover:bg-neutral-800 disabled:opacity-50"
+            className="btn btn-primary w-fit"
           >
             {isPending ? "Importando..." : `Importar ${readyCount} movimientos`}
           </button>

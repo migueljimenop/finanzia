@@ -14,7 +14,7 @@ export function DeleteAccountButton({ id, name }: { id: string; name: string }) 
         }
       }}
     >
-      <button type="submit" className="text-sm text-red-600 hover:underline">
+      <button type="submit" className="btn-danger-text">
         Eliminar
       </button>
     </form>
