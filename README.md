@@ -127,9 +127,12 @@ configurados, seed y CI de lint/build.
   para elegir automáticamente la cuenta correcta en vez de la primera del
   mismo banco
 
+### Etapa 3 — Reportes ✅
+- `/reportes`: gasto del mes por cuenta/tarjeta (con la de Falabella
+  destacada, por ser "la tarjeta que trato de no usar"), por categoría, y
+  comparativo de los últimos 6 meses, con navegación mes a mes
+
 ### Falta para las próximas etapas
-- **Etapa 3 — Reportes**: vistas por banco, tarjeta y categoría, mensual y
-  comparativo
 - **Etapa 4 — Forecast y alertas**: proyección de cierre de mes y alertas
   de gasto hormiga cuando el acumulado se desvía del promedio histórico
 - Gestión de reglas de distribución desde la UI (hoy solo existe la regla

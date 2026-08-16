@@ -23,6 +23,7 @@ const NAV_LINKS = [
   { href: "/cuentas", label: "Cuentas" },
   { href: "/ingresos", label: "Ingresos" },
   { href: "/movimientos", label: "Movimientos" },
+  { href: "/reportes", label: "Reportes" },
 ];
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
