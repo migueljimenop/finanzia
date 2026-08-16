@@ -1,18 +1,21 @@
 import { prisma } from "@/lib/prisma";
+import { requireUserId } from "@/lib/session";
 import { formatCLP, BUCKET_TYPE_LABELS, accountLabel } from "@/lib/format";
 import { registerIncome } from "./actions";
 
 export const dynamic = "force-dynamic";
 
 export default async function IngresosPage() {
+  const userId = await requireUserId();
   const [accounts, rules, incomes] = await Promise.all([
-    prisma.account.findMany({ orderBy: { name: "asc" } }),
+    prisma.account.findMany({ where: { userId }, orderBy: { name: "asc" } }),
     prisma.distributionRule.findMany({
-      where: { isActive: true },
+      where: { userId, isActive: true },
       include: { buckets: true },
       orderBy: { createdAt: "asc" },
     }),
     prisma.income.findMany({
+      where: { userId },
       orderBy: { date: "desc" },
       take: 10,
       include: { account: true, distributions: true },

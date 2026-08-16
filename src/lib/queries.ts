@@ -18,41 +18,48 @@ export function expenseRangeFilter(start: Date, end: Date): Prisma.TransactionWh
   return { type: TxType.EXPENSE, date: { gte: start, lte: end } };
 }
 
-/** Gasto del período en las cuentas relevantes: base común de margen, forecast,
- * alertas y reportes. */
-export function expenseSpendWhere(start: Date, end: Date): Prisma.TransactionWhereInput {
-  return { ...expenseRangeFilter(start, end), ...spendAccountFilter() };
+/** Gasto del período en las cuentas relevantes del usuario: base común de
+ * margen, forecast, alertas y reportes. */
+export function expenseSpendWhere(
+  start: Date,
+  end: Date,
+  userId: string
+): Prisma.TransactionWhereInput {
+  return { userId, ...expenseRangeFilter(start, end), ...spendAccountFilter() };
 }
 
-export async function sumExpenseTotal(start: Date, end: Date): Promise<number> {
+export async function sumExpenseTotal(start: Date, end: Date, userId: string): Promise<number> {
   const agg = await prisma.transaction.aggregate({
     _sum: { amount: true },
-    where: expenseSpendWhere(start, end),
+    where: expenseSpendWhere(start, end, userId),
   });
   return Number(agg._sum.amount ?? 0);
 }
 
 export async function sumExpenseByCategory(
   start: Date,
-  end: Date
+  end: Date,
+  userId: string
 ): Promise<Map<string | null, number>> {
   const results = await prisma.transaction.groupBy({
     by: ["categoryId"],
     _sum: { amount: true },
-    where: expenseSpendWhere(start, end),
+    where: expenseSpendWhere(start, end, userId),
   });
   return new Map(results.map((r) => [r.categoryId, Number(r._sum.amount ?? 0)]));
 }
 
-export async function sumExpenseByCategoryWithNames(start: Date, end: Date) {
+export async function sumExpenseByCategoryWithNames(start: Date, end: Date, userId: string) {
   const results = await prisma.transaction.groupBy({
     by: ["categoryId"],
     _sum: { amount: true },
-    where: expenseSpendWhere(start, end),
+    where: expenseSpendWhere(start, end, userId),
   });
 
   const categoryIds = results.map((r) => r.categoryId).filter((id): id is string => id !== null);
-  const categories = await prisma.category.findMany({ where: { id: { in: categoryIds } } });
+  const categories = await prisma.category.findMany({
+    where: { id: { in: categoryIds }, userId },
+  });
   const categoryById = new Map(categories.map((c) => [c.id, c]));
 
   return results
@@ -66,15 +73,15 @@ export async function sumExpenseByCategoryWithNames(start: Date, end: Date) {
     .sort((a, b) => b.amount - a.amount);
 }
 
-export async function sumExpenseByAccount(start: Date, end: Date) {
+export async function sumExpenseByAccount(start: Date, end: Date, userId: string) {
   const results = await prisma.transaction.groupBy({
     by: ["accountId"],
     _sum: { amount: true },
-    where: expenseSpendWhere(start, end),
+    where: expenseSpendWhere(start, end, userId),
   });
 
   const accounts = await prisma.account.findMany({
-    where: { id: { in: results.map((r) => r.accountId) } },
+    where: { id: { in: results.map((r) => r.accountId) }, userId },
   });
   const accountById = new Map(accounts.map((a) => [a.id, a]));
 

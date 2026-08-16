@@ -4,6 +4,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { requireUserId } from "@/lib/session";
 import { Bank, AccountType } from "@/generated/prisma/client";
 
 const accountSchema = z.object({
@@ -19,6 +20,7 @@ const accountSchema = z.object({
 });
 
 export async function createAccount(formData: FormData) {
+  const userId = await requireUserId();
   const data = accountSchema.parse({
     name: formData.get("name"),
     bank: formData.get("bank"),
@@ -27,13 +29,14 @@ export async function createAccount(formData: FormData) {
     accountNumber: formData.get("accountNumber"),
   });
 
-  await prisma.account.create({ data });
+  await prisma.account.create({ data: { ...data, userId } });
 
   revalidatePath("/cuentas");
   redirect("/cuentas");
 }
 
 export async function updateAccount(id: string, formData: FormData) {
+  const userId = await requireUserId();
   const data = accountSchema.parse({
     name: formData.get("name"),
     bank: formData.get("bank"),
@@ -42,13 +45,14 @@ export async function updateAccount(id: string, formData: FormData) {
     accountNumber: formData.get("accountNumber"),
   });
 
-  await prisma.account.update({ where: { id }, data });
+  await prisma.account.updateMany({ where: { id, userId }, data });
 
   revalidatePath("/cuentas");
   redirect("/cuentas");
 }
 
 export async function deleteAccount(id: string) {
-  await prisma.account.delete({ where: { id } });
+  const userId = await requireUserId();
+  await prisma.account.deleteMany({ where: { id, userId } });
   revalidatePath("/cuentas");
 }

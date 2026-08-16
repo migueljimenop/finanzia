@@ -26,7 +26,7 @@ describe("getMarginSummary", () => {
     mocks.incomeAggregate.mockResolvedValue({ _sum: { amount: 500000 } });
     mocks.txAggregate.mockResolvedValue({ _sum: { amount: 120000 } });
 
-    const margin = await getMarginSummary(new Date(2026, 7, 1));
+    const margin = await getMarginSummary("user-1", new Date(2026, 7, 1));
 
     expect(margin.monthlyMargin).toBe(500000);
     expect(margin.spent).toBe(120000);
@@ -35,6 +35,7 @@ describe("getMarginSummary", () => {
 
     const where = mocks.txAggregate.mock.calls[0][0].where;
     expect(where.type).toBe(TxType.EXPENSE);
+    expect(where.userId).toBe("user-1");
     // El OR de cuentas debe incluir explícitamente Falabella.
     const banks = where.OR.map((o: { account: { bank: string } }) => o.account.bank);
     expect(banks).toContain("FALABELLA");
@@ -49,7 +50,7 @@ describe("getMonthEndForecast", () => {
     mocks.incomeAggregate.mockResolvedValue({ _sum: { amount: 500000 } });
     mocks.txAggregate.mockResolvedValue({ _sum: { amount: 120000 } });
 
-    const forecast = await getMonthEndForecast(new Date(2026, 7, 10));
+    const forecast = await getMonthEndForecast("user-1", new Date(2026, 7, 10));
 
     // margen 500000, gastado 120000 hasta el día 10 de un mes de 31 días.
     expect(forecast.daysElapsed).toBe(10);
@@ -63,7 +64,7 @@ describe("getMonthEndForecast", () => {
     mocks.incomeAggregate.mockResolvedValue({ _sum: { amount: 100000 } });
     mocks.txAggregate.mockResolvedValue({ _sum: { amount: 60000 } });
 
-    const forecast = await getMonthEndForecast(new Date(2026, 7, 10));
+    const forecast = await getMonthEndForecast("user-1", new Date(2026, 7, 10));
     // 60000 / 10 días = 6000/día -> 186000 al mes > margen 100000.
     expect(forecast.projectedRemaining).toBeLessThan(0);
     expect(forecast.onTrack).toBe(false);

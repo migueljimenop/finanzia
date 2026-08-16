@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { requireUserId } from "@/lib/session";
 import { formatCLP, TX_TYPE_LABELS, TX_SOURCE_LABELS } from "@/lib/format";
 import { DeleteMovementButton } from "./DeleteMovementButton";
 
@@ -13,7 +14,9 @@ const AMOUNT_CLASS: Record<string, string> = {
 };
 
 export default async function MovimientosPage() {
+  const userId = await requireUserId();
   const transactions = await prisma.transaction.findMany({
+    where: { userId },
     orderBy: { date: "desc" },
     take: 100,
     include: { account: true, category: true },
@@ -57,8 +60,15 @@ export default async function MovimientosPage() {
                 <td className="whitespace-nowrap text-foreground-secondary">
                   {tx.category?.name ?? "—"}
                 </td>
-                <td className="whitespace-nowrap text-foreground-secondary">{TX_TYPE_LABELS[tx.type]}</td>
-                <td>{tx.description ?? "—"}</td>
+                <td className="whitespace-nowrap text-foreground-secondary">
+                  {TX_TYPE_LABELS[tx.type]}
+                </td>
+                <td
+                  className="max-w-xs truncate"
+                  title={tx.description ?? undefined}
+                >
+                  {tx.description ?? "—"}
+                </td>
                 <td className="whitespace-nowrap text-foreground-muted">{TX_SOURCE_LABELS[tx.source]}</td>
                 <td className={`text-right num whitespace-nowrap font-medium ${AMOUNT_CLASS[tx.type]}`}>
                   {AMOUNT_PREFIX[tx.type]}

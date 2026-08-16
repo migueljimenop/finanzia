@@ -21,18 +21,18 @@ function getDaysRemaining(reference: Date, monthEnd: Date) {
  * la tarjeta Falabella; Mercado Pago queda fuera).
  */
 
-export async function getMarginSummary(reference: Date = new Date()) {
+export async function getMarginSummary(userId: string, reference: Date = new Date()) {
   const { start, end } = getMonthRange(reference);
 
   const marginAgg = await prisma.incomeDistribution.aggregate({
     _sum: { amount: true },
     where: {
       type: BucketType.AVAILABLE_MARGIN,
-      income: { date: { gte: start, lte: end } },
+      income: { userId, date: { gte: start, lte: end } },
     },
   });
 
-  const spent = await sumExpenseTotal(start, end);
+  const spent = await sumExpenseTotal(start, end, userId);
 
   const monthlyMargin = Number(marginAgg._sum.amount ?? 0);
   const remaining = monthlyMargin - spent;
@@ -42,19 +42,19 @@ export async function getMarginSummary(reference: Date = new Date()) {
   return { monthlyMargin, spent, remaining, daysRemaining, dailyAvailable };
 }
 
-export async function getBucketBreakdown(reference: Date = new Date()) {
+export async function getBucketBreakdown(userId: string, reference: Date = new Date()) {
   const { start, end } = getMonthRange(reference);
 
   const results = await prisma.incomeDistribution.groupBy({
     by: ["type"],
     _sum: { amount: true },
-    where: { income: { date: { gte: start, lte: end } } },
+    where: { income: { userId, date: { gte: start, lte: end } } },
   });
 
   return results.map((r) => ({ type: r.type, amount: Number(r._sum.amount ?? 0) }));
 }
 
-export async function getConsolidatedBalance() {
-  const agg = await prisma.account.aggregate({ _sum: { balance: true } });
+export async function getConsolidatedBalance(userId: string) {
+  const agg = await prisma.account.aggregate({ _sum: { balance: true }, where: { userId } });
   return Number(agg._sum.balance ?? 0);
 }

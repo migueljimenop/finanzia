@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireUserId } from "@/lib/session";
 import { formatCLP, BANK_LABELS, BUCKET_TYPE_LABELS } from "@/lib/format";
 import { getMarginSummary, getBucketBreakdown, getConsolidatedBalance } from "@/lib/margin";
 import { getMonthEndForecast } from "@/lib/forecast";
@@ -7,13 +8,15 @@ import { getAnthillReport } from "@/lib/alerts";
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
+  const userId = await requireUserId();
+
   const [accounts, consolidatedBalance, margin, breakdown, forecast, anthill] = await Promise.all([
-    prisma.account.findMany({ orderBy: { name: "asc" } }),
-    getConsolidatedBalance(),
-    getMarginSummary(),
-    getBucketBreakdown(),
-    getMonthEndForecast(),
-    getAnthillReport(),
+    prisma.account.findMany({ where: { userId }, orderBy: { name: "asc" } }),
+    getConsolidatedBalance(userId),
+    getMarginSummary(userId),
+    getBucketBreakdown(userId),
+    getMonthEndForecast(userId),
+    getAnthillReport(userId),
   ]);
 
   return (

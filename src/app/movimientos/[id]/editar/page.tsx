@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { requireUserId } from "@/lib/session";
 import { toDateInputValue } from "@/lib/date";
 import { MovementForm } from "../../MovementForm";
 import { updateMovement } from "../../actions";
@@ -11,13 +12,16 @@ export default async function EditarMovimientoPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const userId = await requireUserId();
   const [transaction, accounts, categories] = await Promise.all([
-    prisma.transaction.findUnique({ where: { id } }),
+    prisma.transaction.findFirst({ where: { id, userId } }),
     prisma.account.findMany({
+      where: { userId },
       select: { id: true, name: true, accountNumber: true },
       orderBy: { name: "asc" },
     }),
     prisma.category.findMany({
+      where: { userId },
       select: { id: true, name: true, kind: true },
       orderBy: { name: "asc" },
     }),

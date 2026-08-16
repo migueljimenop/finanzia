@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getSpendByAccount, getSpendByCategory, getMonthlyComparison } from "@/lib/reports";
 import { parseMonthParam, toMonthParam } from "@/lib/date";
+import { requireUserId } from "@/lib/session";
 import { BANK_LABELS, formatCLP } from "@/lib/format";
 import { Bank } from "@/generated/prisma/enums";
 import { BarList } from "./BarList";
@@ -12,6 +13,7 @@ export default async function ReportesPage({
 }: {
   searchParams: Promise<{ month?: string }>;
 }) {
+  const userId = await requireUserId();
   const { month } = await searchParams;
   const reference = parseMonthParam(month);
 
@@ -19,9 +21,9 @@ export default async function ReportesPage({
   const nextMonth = new Date(reference.getFullYear(), reference.getMonth() + 1, 1);
 
   const [byAccount, byCategory, monthly] = await Promise.all([
-    getSpendByAccount(reference),
-    getSpendByCategory(reference),
-    getMonthlyComparison(reference, 6),
+    getSpendByAccount(userId, reference),
+    getSpendByCategory(userId, reference),
+    getMonthlyComparison(userId, reference, 6),
   ]);
 
   const totalSpend = byAccount.reduce((sum, a) => sum + a.amount, 0);

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { requireUserId } from "@/lib/session";
 import { parseLocalDate } from "@/lib/date";
 import { TxType, TxSource } from "@/generated/prisma/client";
 
@@ -25,10 +26,12 @@ const importSchema = z.object({
 export type ImportMovementsInput = z.infer<typeof importSchema>;
 
 export async function importMovements(input: ImportMovementsInput) {
+  const userId = await requireUserId();
   const data = importSchema.parse(input);
 
   await prisma.transaction.createMany({
     data: data.rows.map((row) => ({
+      userId,
       accountId: data.accountId,
       categoryId: data.categoryId,
       type: row.type,
