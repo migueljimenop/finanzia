@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Wallet } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 
 export default function LoginPage() {
@@ -37,23 +38,35 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="max-w-sm mx-auto flex flex-col gap-6">
-      <div className="text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">Finanzia</h1>
-        <p className="text-sm text-foreground-muted mt-1">
-          {mode === "signin" ? "Inicia sesión para continuar" : "Crea tu cuenta para empezar"}
-        </p>
+    <div className="max-w-sm mx-auto flex flex-col gap-6 pt-4">
+      <div className="flex flex-col items-center text-center gap-3">
+        <span
+          className="icon-badge"
+          style={{ width: "3rem", height: "3rem", background: "var(--accent)", color: "var(--accent-foreground)" }}
+        >
+          <Wallet size={24} strokeWidth={2.25} aria-hidden />
+        </span>
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Finanzia</h1>
+          <p className="text-sm text-foreground-muted mt-1">
+            {mode === "signin" ? "Inicia sesión para continuar" : "Crea tu cuenta para empezar"}
+          </p>
+        </div>
       </div>
 
       <div className="surface-card p-5 flex flex-col gap-4">
-        <div className="flex rounded-lg overflow-hidden border border-[var(--border)]">
+        <div className="flex gap-1 rounded-lg p-1" style={{ background: "var(--surface-sunken)" }}>
           <button
             type="button"
             onClick={() => {
               setMode("signin");
               setError(null);
             }}
-            className={`flex-1 py-2 text-sm font-medium ${mode === "signin" ? "bg-foreground text-background" : "text-foreground-muted"}`}
+            className={`flex-1 py-1.5 rounded-md text-sm font-medium transition-colors ${
+              mode === "signin"
+                ? "bg-[var(--surface)] text-foreground shadow-sm"
+                : "text-foreground-muted hover:text-foreground"
+            }`}
           >
             Iniciar sesión
           </button>
@@ -63,7 +76,11 @@ export default function LoginPage() {
               setMode("signup");
               setError(null);
             }}
-            className={`flex-1 py-2 text-sm font-medium ${mode === "signup" ? "bg-foreground text-background" : "text-foreground-muted"}`}
+            className={`flex-1 py-1.5 rounded-md text-sm font-medium transition-colors ${
+              mode === "signup"
+                ? "bg-[var(--surface)] text-foreground shadow-sm"
+                : "text-foreground-muted hover:text-foreground"
+            }`}
           >
             Crear cuenta
           </button>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { TriangleAlert } from "lucide-react";
 
 export default function ErrorPage({
   error,
@@ -11,6 +12,12 @@ export default function ErrorPage({
 }) {
   return (
     <div className="flex flex-col items-center gap-4 text-center py-16">
+      <span
+        className="icon-badge"
+        style={{ width: "3rem", height: "3rem", background: "var(--status-critical-bg)", color: "var(--status-critical)" }}
+      >
+        <TriangleAlert size={22} strokeWidth={2.25} aria-hidden />
+      </span>
       <h1 className="text-xl font-semibold tracking-tight">Algo salió mal</h1>
       <p className="text-sm text-foreground-muted max-w-md">
         Hubo un error al cargar esta página. Intenta de nuevo y, si persiste, revisa que la

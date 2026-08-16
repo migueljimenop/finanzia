@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Landmark, Plus } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/session";
 import { formatCLP, BANK_LABELS, ACCOUNT_TYPE_LABELS } from "@/lib/format";
@@ -15,7 +16,8 @@ export default async function CuentasPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Cuentas</h1>
         <Link href="/cuentas/nueva" className="btn btn-primary">
-          + Nueva cuenta
+          <Plus size={16} strokeWidth={2.5} aria-hidden />
+          Nueva cuenta
         </Link>
       </div>
 
@@ -51,8 +53,20 @@ export default async function CuentasPage() {
             ))}
             {accounts.length === 0 && (
               <tr>
-                <td colSpan={6} className="text-center text-foreground-muted py-8">
-                  No hay cuentas registradas todavía.
+                <td colSpan={6} className="py-14">
+                  <div className="flex flex-col items-center gap-3 text-center">
+                    <span
+                      className="icon-badge"
+                      style={{ width: "3rem", height: "3rem", background: "var(--surface-sunken)", color: "var(--foreground-muted)" }}
+                    >
+                      <Landmark size={22} strokeWidth={2} aria-hidden />
+                    </span>
+                    <p className="text-sm text-foreground-muted">No hay cuentas registradas todavía.</p>
+                    <Link href="/cuentas/nueva" className="btn btn-primary">
+                      <Plus size={16} strokeWidth={2.5} aria-hidden />
+                      Crear tu primera cuenta
+                    </Link>
+                  </div>
                 </td>
               </tr>
             )}

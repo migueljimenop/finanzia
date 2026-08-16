@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/session";
+import { BackLink } from "../../../BackLink";
 import { AccountForm } from "../../AccountForm";
 import { updateAccount } from "../../actions";
 
@@ -21,9 +21,7 @@ export default async function EditarCuentaPage({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <Link href="/cuentas" className="link-quiet">
-          ← Volver a cuentas
-        </Link>
+        <BackLink href="/cuentas" label="Volver a cuentas" />
         <h1 className="text-2xl font-semibold tracking-tight mt-2">Editar cuenta</h1>
       </div>
 

@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/session";
 import { BANK_LABELS } from "@/lib/format";
+import { BackLink } from "../../BackLink";
 import { ImportWizard } from "./ImportWizard";
 
 export const dynamic = "force-dynamic";
@@ -30,9 +30,7 @@ export default async function ImportarMovimientosPage() {
   return (
     <div className="flex flex-col gap-10">
       <div>
-        <Link href="/movimientos" className="link-quiet">
-          ← Volver a movimientos
-        </Link>
+        <BackLink href="/movimientos" label="Volver a movimientos" />
         <h1 className="text-2xl font-semibold tracking-tight mt-2">Importar movimientos</h1>
         <p className="text-sm text-foreground-muted mt-1">
           Sube una cartola en CSV, XLS o XLSX. Si el formato de Santander, Banco de

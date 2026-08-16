@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { ArrowDownToLine } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/session";
 import { formatCLP, BUCKET_TYPE_LABELS, accountLabel } from "@/lib/format";
+import { BUCKET_COLORS } from "@/lib/bucket-colors";
 import { registerIncome } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -98,7 +100,13 @@ export default async function IngresosPage() {
         <div className="flex flex-col gap-4">
           {incomes.map((income) => (
             <div key={income.id} className="surface-card p-4">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span
+                  className="icon-badge"
+                  style={{ background: "var(--status-good-bg)", color: "var(--status-good)" }}
+                >
+                  <ArrowDownToLine size={16} strokeWidth={2.25} aria-hidden />
+                </span>
                 <div>
                   <p className="font-medium text-sm">
                     <span className="stat-value">{formatCLP(income.amount)}</span> → {income.account.name}
@@ -111,7 +119,11 @@ export default async function IngresosPage() {
               </div>
               <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
                 {income.distributions.map((d) => (
-                  <div key={d.id} className="rounded-lg p-2.5" style={{ background: "var(--background)" }}>
+                  <div
+                    key={d.id}
+                    className="rounded-lg p-2.5 border-l-2"
+                    style={{ background: "var(--surface-sunken)", borderColor: BUCKET_COLORS[d.type] }}
+                  >
                     <p className="stat-label">{BUCKET_TYPE_LABELS[d.type]}</p>
                     <p className="stat-value font-medium mt-1">{formatCLP(d.amount)}</p>
                   </div>

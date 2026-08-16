@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowLeftRight, Plus, Upload } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/session";
 import { formatCLP, TX_TYPE_LABELS, TX_SOURCE_LABELS } from "@/lib/format";
@@ -28,10 +29,12 @@ export default async function MovimientosPage() {
         <h1 className="text-2xl font-semibold tracking-tight">Movimientos</h1>
         <div className="flex gap-3">
           <Link href="/movimientos/importar" className="btn btn-secondary">
+            <Upload size={16} strokeWidth={2.25} aria-hidden />
             Importar CSV
           </Link>
           <Link href="/movimientos/nueva" className="btn btn-primary">
-            + Nuevo movimiento
+            <Plus size={16} strokeWidth={2.5} aria-hidden />
+            Nuevo movimiento
           </Link>
         </div>
       </div>
@@ -86,8 +89,20 @@ export default async function MovimientosPage() {
             ))}
             {transactions.length === 0 && (
               <tr>
-                <td colSpan={8} className="text-center text-foreground-muted py-8">
-                  No hay movimientos registrados todavía.
+                <td colSpan={8} className="py-14">
+                  <div className="flex flex-col items-center gap-3 text-center">
+                    <span
+                      className="icon-badge"
+                      style={{ width: "3rem", height: "3rem", background: "var(--surface-sunken)", color: "var(--foreground-muted)" }}
+                    >
+                      <ArrowLeftRight size={22} strokeWidth={2} aria-hidden />
+                    </span>
+                    <p className="text-sm text-foreground-muted">No hay movimientos registrados todavía.</p>
+                    <Link href="/movimientos/nueva" className="btn btn-primary">
+                      <Plus size={16} strokeWidth={2.5} aria-hidden />
+                      Registrar movimiento
+                    </Link>
+                  </div>
                 </td>
               </tr>
             )}

@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/session";
 import { toDateInputValue } from "@/lib/date";
+import { BackLink } from "../../../BackLink";
 import { MovementForm } from "../../MovementForm";
 import { updateMovement } from "../../actions";
 
@@ -34,9 +34,7 @@ export default async function EditarMovimientoPage({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <Link href="/movimientos" className="link-quiet">
-          ← Volver a movimientos
-        </Link>
+        <BackLink href="/movimientos" label="Volver a movimientos" />
         <h1 className="text-2xl font-semibold tracking-tight mt-2">Editar movimiento</h1>
       </div>
 

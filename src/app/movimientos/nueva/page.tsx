@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/session";
+import { BackLink } from "../../BackLink";
 import { MovementForm } from "../MovementForm";
 import { createMovement } from "../actions";
 
@@ -24,9 +24,7 @@ export default async function NuevoMovimientoPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <Link href="/movimientos" className="link-quiet">
-          ← Volver a movimientos
-        </Link>
+        <BackLink href="/movimientos" label="Volver a movimientos" />
         <h1 className="text-2xl font-semibold tracking-tight mt-2">Nuevo movimiento</h1>
       </div>
 

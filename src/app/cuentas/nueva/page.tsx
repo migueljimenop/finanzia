@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { requireUserId } from "@/lib/session";
+import { BackLink } from "../../BackLink";
 import { AccountForm } from "../AccountForm";
 import { createAccount } from "../actions";
 
@@ -9,9 +9,7 @@ export default async function NuevaCuentaPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <Link href="/cuentas" className="link-quiet">
-          ← Volver a cuentas
-        </Link>
+        <BackLink href="/cuentas" label="Volver a cuentas" />
         <h1 className="text-2xl font-semibold tracking-tight mt-2">Nueva cuenta</h1>
       </div>
 

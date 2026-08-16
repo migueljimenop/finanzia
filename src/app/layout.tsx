@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Wallet } from "lucide-react";
 import "./globals.css";
 import { NavLinks } from "./NavLinks";
 import { LogoutButton } from "./LogoutButton";
@@ -31,13 +32,21 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <header className="border-b border-[var(--border)] sticky top-0 z-10 bg-[var(--background)]/90 backdrop-blur-sm">
-          <nav className="max-w-5xl mx-auto px-6 py-4 flex items-center gap-8">
-            <span className="font-semibold tracking-tight">Finanzia</span>
+          <nav className="max-w-5xl mx-auto px-6 py-3.5 flex items-center gap-6">
+            <Link href="/" className="flex items-center gap-2 shrink-0">
+              <span
+                className="icon-badge"
+                style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+              >
+                <Wallet size={18} strokeWidth={2.25} aria-hidden />
+              </span>
+              <span className="font-semibold tracking-tight hidden sm:inline">Finanzia</span>
+            </Link>
             {session?.user ? (
               <>
                 <NavLinks />
                 <div className="ml-auto flex items-center gap-4 text-sm text-foreground-muted">
-                  <span>{session.user.name ?? session.user.email}</span>
+                  <span className="hidden sm:inline">{session.user.name ?? session.user.email}</span>
                   <LogoutButton />
                 </div>
               </>
