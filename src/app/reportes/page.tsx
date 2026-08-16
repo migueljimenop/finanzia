@@ -30,49 +30,56 @@ export default async function ReportesPage({
     <div className="flex flex-col gap-10">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Reportes</h1>
-          <p className="text-sm text-neutral-500 mt-1">
-            Gasto total del mes: {formatCLP(totalSpend)}
+          <h1 className="text-2xl font-semibold tracking-tight">Reportes</h1>
+          <p className="text-sm text-foreground-muted mt-1">
+            Gasto total del mes: <span className="stat-value font-medium text-foreground">{formatCLP(totalSpend)}</span>
           </p>
         </div>
-        <div className="flex items-center gap-3 text-sm">
-          <Link href={`/reportes?month=${toMonthParam(prevMonth)}`} className="hover:underline">
+        <div className="flex items-center gap-4 text-sm">
+          <Link href={`/reportes?month=${toMonthParam(prevMonth)}`} className="link-quiet">
             ← Anterior
           </Link>
-          <span className="font-medium">{monthLabel(reference)}</span>
-          <Link href={`/reportes?month=${toMonthParam(nextMonth)}`} className="hover:underline">
+          <span className="font-medium min-w-32 text-center">{monthLabel(reference)}</span>
+          <Link href={`/reportes?month=${toMonthParam(nextMonth)}`} className="link-quiet">
             Siguiente →
           </Link>
         </div>
       </div>
 
-      <div>
-        <h2 className="text-lg font-semibold mb-3">Gasto por cuenta / tarjeta</h2>
-        <BarList
-          items={byAccount.map((a) => ({
-            label: `${a.accountName}${a.bank ? ` (${BANK_LABELS[a.bank]})` : ""}`,
-            amount: a.amount,
-            highlight: a.bank === Bank.FALABELLA,
-          }))}
-          emptyLabel="Sin gastos registrados este mes."
-        />
-      </div>
+      <section>
+        <h2 className="text-base font-semibold tracking-tight mb-3">Gasto por cuenta / tarjeta</h2>
+        <div className="surface-card p-5">
+          <BarList
+            items={byAccount.map((a) => ({
+              label:
+                a.accountName + (a.bank && BANK_LABELS[a.bank] !== a.accountName ? ` (${BANK_LABELS[a.bank]})` : ""),
+              amount: a.amount,
+              highlight: a.bank === Bank.FALABELLA,
+            }))}
+            emptyLabel="Sin gastos registrados este mes."
+          />
+        </div>
+      </section>
 
-      <div>
-        <h2 className="text-lg font-semibold mb-3">Gasto por categoría</h2>
-        <BarList
-          items={byCategory.map((c) => ({ label: c.categoryName, amount: c.amount }))}
-          emptyLabel="Sin gastos registrados este mes."
-        />
-      </div>
+      <section>
+        <h2 className="text-base font-semibold tracking-tight mb-3">Gasto por categoría</h2>
+        <div className="surface-card p-5">
+          <BarList
+            items={byCategory.map((c) => ({ label: c.categoryName, amount: c.amount }))}
+            emptyLabel="Sin gastos registrados este mes."
+          />
+        </div>
+      </section>
 
-      <div>
-        <h2 className="text-lg font-semibold mb-3">Comparativo mensual (últimos 6 meses)</h2>
-        <BarList
-          items={monthly.map((m) => ({ label: m.label, amount: m.amount }))}
-          emptyLabel="Sin datos históricos todavía."
-        />
-      </div>
+      <section>
+        <h2 className="text-base font-semibold tracking-tight mb-3">Comparativo mensual (últimos 6 meses)</h2>
+        <div className="surface-card p-5">
+          <BarList
+            items={monthly.map((m) => ({ label: m.label, amount: m.amount }))}
+            emptyLabel="Sin datos históricos todavía."
+          />
+        </div>
+      </section>
     </div>
   );
 }

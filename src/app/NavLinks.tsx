@@ -16,7 +16,7 @@ export function NavLinks() {
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   return (
-    <div className="flex gap-4 text-sm">
+    <div className="flex gap-6 text-sm">
       {NAV_LINKS.map((link) => (
         <Link
           key={link.href}
@@ -24,8 +24,8 @@ export function NavLinks() {
           aria-current={isActive(link.href) ? "page" : undefined}
           className={
             isActive(link.href)
-              ? "font-semibold underline underline-offset-4"
-              : "text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100"
+              ? "border-b-2 border-accent pb-1 font-medium text-foreground"
+              : "border-b-2 border-transparent pb-1 text-foreground-muted transition-colors hover:text-foreground"
           }
         >
           {link.label}

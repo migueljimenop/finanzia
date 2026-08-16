@@ -25,13 +25,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <header className="border-b">
-          <nav className="max-w-5xl mx-auto px-6 py-4 flex items-center gap-6">
-            <span className="font-semibold">Finanzia</span>
+        <header className="border-b border-[var(--border)] sticky top-0 z-10 bg-[var(--background)]/90 backdrop-blur-sm">
+          <nav className="max-w-5xl mx-auto px-6 py-4 flex items-center gap-8">
+            <span className="font-semibold tracking-tight">Finanzia</span>
             <NavLinks />
           </nav>
         </header>
-        <main className="flex-1 max-w-5xl mx-auto w-full px-6 py-8">{children}</main>
+        <main className="flex-1 max-w-5xl mx-auto w-full px-6 py-10">{children}</main>
       </body>
     </html>
   );

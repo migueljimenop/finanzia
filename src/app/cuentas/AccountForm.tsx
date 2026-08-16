@@ -15,26 +15,21 @@ type Props = {
 
 export function AccountForm({ action, defaultValues, submitLabel }: Props) {
   return (
-    <form action={action} className="flex flex-col gap-4 max-w-sm">
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Nombre</span>
+    <form action={action} className="flex flex-col gap-5 max-w-sm">
+      <label className="flex flex-col gap-1.5">
+        <span className="field-label">Nombre</span>
         <input
           name="name"
           type="text"
           required
           defaultValue={defaultValues?.name}
-          className="border rounded px-3 py-2"
+          className="field-control"
         />
       </label>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Banco</span>
-        <select
-          name="bank"
-          required
-          defaultValue={defaultValues?.bank}
-          className="border rounded px-3 py-2"
-        >
+      <label className="flex flex-col gap-1.5">
+        <span className="field-label">Banco</span>
+        <select name="bank" required defaultValue={defaultValues?.bank} className="field-control">
           {Object.values(Bank).map((bank) => (
             <option key={bank} value={bank}>
               {BANK_LABELS[bank]}
@@ -43,14 +38,9 @@ export function AccountForm({ action, defaultValues, submitLabel }: Props) {
         </select>
       </label>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Tipo</span>
-        <select
-          name="type"
-          required
-          defaultValue={defaultValues?.type}
-          className="border rounded px-3 py-2"
-        >
+      <label className="flex flex-col gap-1.5">
+        <span className="field-label">Tipo</span>
+        <select name="type" required defaultValue={defaultValues?.type} className="field-control">
           {Object.values(AccountType).map((type) => (
             <option key={type} value={type}>
               {ACCOUNT_TYPE_LABELS[type]}
@@ -59,39 +49,34 @@ export function AccountForm({ action, defaultValues, submitLabel }: Props) {
         </select>
       </label>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">
-          Número de cuenta (opcional)
-        </span>
+      <label className="flex flex-col gap-1.5">
+        <span className="field-label">Número de cuenta (opcional)</span>
         <input
           name="accountNumber"
           type="text"
           defaultValue={defaultValues?.accountNumber ?? ""}
           placeholder="Ej: 0-000-76-32920-6"
-          className="border rounded px-3 py-2"
+          className="field-control"
         />
-        <span className="text-xs text-neutral-500">
-          Sirve para distinguir varias cuentas del mismo banco al importar
-          cartolas — si el archivo trae el número, se detecta solo.
+        <span className="field-hint">
+          Sirve para distinguir varias cuentas del mismo banco al importar cartolas — si el
+          archivo trae el número, se detecta solo.
         </span>
       </label>
 
-      <label className="flex flex-col gap-1">
-        <span className="text-sm font-medium">Saldo actual (CLP)</span>
+      <label className="flex flex-col gap-1.5">
+        <span className="field-label">Saldo actual (CLP)</span>
         <input
           name="balance"
           type="number"
           step="1"
           required
           defaultValue={defaultValues?.balance}
-          className="border rounded px-3 py-2"
+          className="field-control"
         />
       </label>
 
-      <button
-        type="submit"
-        className="bg-black text-white rounded px-4 py-2 hover:bg-neutral-800"
-      >
+      <button type="submit" className="btn btn-primary w-fit">
         {submitLabel}
       </button>
     </form>

@@ -20,10 +20,10 @@ export default async function NuevoMovimientoPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <Link href="/movimientos" className="text-sm text-neutral-500 hover:underline">
+        <Link href="/movimientos" className="link-quiet">
           ← Volver a movimientos
         </Link>
-        <h1 className="text-2xl font-semibold mt-2">Nuevo movimiento</h1>
+        <h1 className="text-2xl font-semibold tracking-tight mt-2">Nuevo movimiento</h1>
       </div>
 
       <MovementForm

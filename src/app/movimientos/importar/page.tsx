@@ -19,11 +19,11 @@ export default async function ImportarMovimientosPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <Link href="/movimientos" className="text-sm text-neutral-500 hover:underline">
+        <Link href="/movimientos" className="link-quiet">
           ← Volver a movimientos
         </Link>
-        <h1 className="text-2xl font-semibold mt-2">Importar movimientos</h1>
-        <p className="text-sm text-neutral-500 mt-1">
+        <h1 className="text-2xl font-semibold tracking-tight mt-2">Importar movimientos</h1>
+        <p className="text-sm text-foreground-muted mt-1">
           Sube una cartola en CSV, XLS o XLSX. Si el formato de Santander, Banco de
           Chile o Falabella se reconoce automáticamente, se detecta la cuenta y el
           tipo de cada movimiento; si no, puedes mapear las columnas manualmente.
