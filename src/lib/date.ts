@@ -16,6 +16,26 @@ export function toDateInputValue(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+/** Formatea una fecha como "YYYY-MM" en hora local, para selectores de mes. */
+export function toMonthParam(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `${year}-${month}`;
+}
+
+/** Parsea un parámetro de mes "YYYY-MM"; si no es válido, usa el mes actual. */
+export function parseMonthParam(value: string | undefined): Date {
+  if (value) {
+    const match = value.match(/^(\d{4})-(\d{1,2})$/);
+    if (match) {
+      const [, year, month] = match;
+      return new Date(Number(year), Number(month) - 1, 1);
+    }
+  }
+  const today = new Date();
+  return new Date(today.getFullYear(), today.getMonth(), 1);
+}
+
 /**
  * Parsea una fecha de cartola bancaria en formato "YYYY-MM-DD", "DD-MM-YYYY"
  * o "DD/MM/YYYY". Devuelve null si no calza con ninguno (el usuario deberá
