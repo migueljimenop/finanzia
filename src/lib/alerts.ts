@@ -1,6 +1,12 @@
 import { prisma } from "@/lib/prisma";
-import { TxType } from "@/generated/prisma/client";
 import { getMonthRange } from "@/lib/margin";
+import { sumExpenseByCategory } from "@/lib/queries";
+import {
+  ALERT_MIN_MONTHS_REQUIRED,
+  ALERT_DEVIATION_THRESHOLD,
+  ALERT_MIN_AMOUNT_TO_FLAG,
+  ALERT_MONTHS_OF_HISTORY,
+} from "@/lib/config";
 
 export type AnthillAlert = {
   categoryId: string | null;
@@ -18,19 +24,20 @@ export type AnthillReport = {
   alerts: AnthillAlert[];
 };
 
-const MIN_MONTHS_REQUIRED = 2;
-const DEVIATION_THRESHOLD = 0.2;
-const MIN_AMOUNT_TO_FLAG = 5000;
+const MIN_MONTHS_REQUIRED = ALERT_MIN_MONTHS_REQUIRED;
+const DEVIATION_THRESHOLD = ALERT_DEVIATION_THRESHOLD;
+const MIN_AMOUNT_TO_FLAG = ALERT_MIN_AMOUNT_TO_FLAG;
 
 /**
  * Compara el gasto acumulado del mes (hasta hoy) contra el promedio de esos
  * mismos días en los `monthsOfHistory` meses anteriores, por categoría y en
  * total. Marca como alerta cuando el gasto actual supera el promedio
- * histórico en más de `DEVIATION_THRESHOLD`.
+ * histórico en más de `DEVIATION_THRESHOLD`. Solo considera el gasto de las
+ * cuentas del margen (src/lib/config.ts).
  */
 export async function getAnthillReport(
   reference: Date = new Date(),
-  monthsOfHistory = 3
+  monthsOfHistory = ALERT_MONTHS_OF_HISTORY
 ): Promise<AnthillReport> {
   const { start } = getMonthRange(reference);
   const today = new Date(reference.getFullYear(), reference.getMonth(), reference.getDate());
@@ -46,7 +53,7 @@ export async function getAnthillReport(
     999
   );
 
-  const currentByCategory = await sumByCategory(start, currentEnd);
+  const currentByCategory = await sumExpenseByCategory(start, currentEnd);
 
   const historicalByMonth: Map<string | null, number>[] = [];
   for (let i = 1; i <= monthsOfHistory; i++) {
@@ -64,7 +71,7 @@ export async function getAnthillReport(
       999
     );
 
-    const monthTotals = await sumByCategory(monthStart, monthEnd);
+    const monthTotals = await sumExpenseByCategory(monthStart, monthEnd);
     // Un mes sin ningún movimiento no cuenta como historial real, solo como
     // un mes calendario vacío.
     if (monthTotals.size > 0) historicalByMonth.push(monthTotals);
@@ -136,14 +143,4 @@ export async function getAnthillReport(
     overall,
     alerts,
   };
-}
-
-async function sumByCategory(start: Date, end: Date): Promise<Map<string | null, number>> {
-  const results = await prisma.transaction.groupBy({
-    by: ["categoryId"],
-    _sum: { amount: true },
-    where: { type: TxType.EXPENSE, date: { gte: start, lte: end } },
-  });
-
-  return new Map(results.map((r) => [r.categoryId, Number(r._sum.amount ?? 0)]));
 }

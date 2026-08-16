@@ -41,6 +41,11 @@ La app queda disponible en `http://localhost:3000`. El seed crea las 4
 cuentas (Santander, Falabella, Mercado Pago, Banco de Chile), categorías de
 gasto por defecto y una regla de distribución de ejemplo.
 
+> **Puerto variable de `prisma dev`**: cada vez que reinicies la base con
+> `prisma dev`, el puerto puede cambiar (5121x). Si la app no conecta,
+> actualiza el puerto en `.env` con el `DATABASE_URL` que imprime `prisma dev`
+> al arrancar (o usa Docker, que fija el puerto en 5432).
+
 ## Modelo de datos
 
 Definido en [`prisma/schema.prisma`](prisma/schema.prisma):
@@ -59,14 +64,21 @@ Definido en [`prisma/schema.prisma`](prisma/schema.prisma):
 
 ### Margen de gasto disponible
 
-Se calcula en [`src/lib/margin.ts`](src/lib/margin.ts):
+Se calcula en [`src/lib/margin.ts`](src/lib/margin.ts). El conjunto de cuentas
+cuyo gasto cuenta como "disponible" se define en un solo lugar,
+[`src/lib/config.ts`](src/lib/config.ts) (`SPEND_ACCOUNTS`), y lo usan también
+el forecast y las alertas para que todo sea consistente:
 
 - **Margen mensual** = suma de `IncomeDistribution` del sobre
   `AVAILABLE_MARGIN` para ingresos del mes actual.
-- **Gastado** = suma de `Transaction` tipo `EXPENSE` del mes en cuentas
-  débito de Santander y Banco de Chile (Mercado Pago queda fuera porque ese
-  dinero ya se asignó al sobre "hogar" al momento de la distribución).
+- **Gastado** = suma de `Transaction` tipo `EXPENSE` del mes en las cuentas de
+  `SPEND_ACCOUNTS` (débito de Santander y Banco de Chile + tarjeta Falabella).
+  Mercado Pago queda fuera porque ese dinero ya se asignó al sobre "hogar" al
+  momento de la distribución.
 - **Disponible hoy** = (margen mensual − gastado) / días restantes del mes.
+
+Los umbrales de las alertas de gasto hormiga y el número de meses de los
+reportes también viven en `src/lib/config.ts`.
 
 ## Scripts
 
@@ -74,6 +86,7 @@ Se calcula en [`src/lib/margin.ts`](src/lib/margin.ts):
 pnpm dev              # servidor de desarrollo
 pnpm build             # build de producción
 pnpm lint               # ESLint
+pnpm test               # tests unitarios (Vitest)
 pnpm prisma studio      # explorar la base de datos
 pnpm prisma migrate dev # nueva migración tras cambiar el schema
 pnpm prisma db seed     # re-ejecutar el seed
