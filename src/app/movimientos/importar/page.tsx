@@ -1,16 +1,20 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { requireUserId } from "@/lib/session";
 import { ImportWizard } from "./ImportWizard";
 
 export const dynamic = "force-dynamic";
 
 export default async function ImportarMovimientosPage() {
+  const userId = await requireUserId();
   const [accounts, categories] = await Promise.all([
     prisma.account.findMany({
+      where: { userId },
       select: { id: true, name: true, bank: true, accountNumber: true },
       orderBy: { name: "asc" },
     }),
     prisma.category.findMany({
+      where: { userId },
       select: { id: true, name: true, kind: true },
       orderBy: { name: "asc" },
     }),

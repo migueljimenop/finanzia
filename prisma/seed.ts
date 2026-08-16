@@ -5,6 +5,11 @@ import { PrismaPg } from "@prisma/adapter-pg";
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
+const DEMO_USER = {
+  email: "demo@finanzia.app",
+  name: "Demo",
+};
+
 const ACCOUNTS: { name: string; bank: Bank; type: AccountType }[] = [
   { name: "Santander", bank: Bank.SANTANDER, type: AccountType.DEBIT },
   { name: "Falabella", bank: Bank.FALABELLA, type: AccountType.CREDIT },
@@ -22,41 +27,51 @@ const EXPENSE_CATEGORIES = [
   "Otros",
 ];
 
-async function seedAccounts() {
+async function getOrCreateDemoUser() {
+  const user =
+    (await prisma.user.findUnique({ where: { email: DEMO_USER.email } })) ??
+    (await prisma.user.create({ data: DEMO_USER }));
+  return user;
+}
+
+async function seedAccounts(userId: string) {
   const accounts: Record<string, string> = {};
   for (const account of ACCOUNTS) {
-    const existing = await prisma.account.findFirst({ where: { name: account.name } });
+    const existing = await prisma.account.findFirst({
+      where: { userId, name: account.name },
+    });
     const record =
       existing ??
       (await prisma.account.create({
-        data: { name: account.name, bank: account.bank, type: account.type, balance: 0 },
+        data: { userId, name: account.name, bank: account.bank, type: account.type, balance: 0 },
       }));
     accounts[account.name] = record.id;
   }
   return accounts;
 }
 
-async function seedCategories() {
+async function seedCategories(userId: string) {
   for (const name of EXPENSE_CATEGORIES) {
     await prisma.category.upsert({
-      where: { name },
+      where: { userId_name: { userId, name } },
       update: {},
-      create: { name, kind: TxType.EXPENSE, isSystem: true },
+      create: { userId, name, kind: TxType.EXPENSE, isSystem: true },
     });
   }
   await prisma.category.upsert({
-    where: { name: "Sueldo" },
+    where: { userId_name: { userId, name: "Sueldo" } },
     update: {},
-    create: { name: "Sueldo", kind: TxType.INCOME, isSystem: true },
+    create: { userId, name: "Sueldo", kind: TxType.INCOME, isSystem: true },
   });
 }
 
-async function seedDistributionRule(mercadoPagoAccountId: string) {
-  const existing = await prisma.distributionRule.findFirst();
+async function seedDistributionRule(userId: string, mercadoPagoAccountId: string) {
+  const existing = await prisma.distributionRule.findFirst({ where: { userId } });
   if (existing) return;
 
   await prisma.distributionRule.create({
     data: {
+      userId,
       name: "Regla mensual (ejemplo)",
       isActive: true,
       buckets: {
@@ -93,9 +108,11 @@ async function seedDistributionRule(mercadoPagoAccountId: string) {
 }
 
 async function main() {
-  const accounts = await seedAccounts();
-  await seedCategories();
-  await seedDistributionRule(accounts["Mercado Pago"]);
+  const user = await getOrCreateDemoUser();
+  const accounts = await seedAccounts(user.id);
+  await seedCategories(user.id);
+  await seedDistributionRule(user.id, accounts["Mercado Pago"]);
+  console.log(`Seed listo para ${user.email}`);
 }
 
 main()

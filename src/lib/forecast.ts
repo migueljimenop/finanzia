@@ -4,8 +4,8 @@ import { getMarginSummary, getMonthRange } from "@/lib/margin";
  * Proyecta el gasto de fin de mes extrapolando el ritmo de gasto actual
  * (gasto acumulado / días transcurridos) a los días totales del mes.
  */
-export async function getMonthEndForecast(reference: Date = new Date()) {
-  const margin = await getMarginSummary(reference);
+export async function getMonthEndForecast(userId: string, reference: Date = new Date()) {
+  const margin = await getMarginSummary(userId, reference);
   const { start, end } = getMonthRange(reference);
 
   const today = new Date(reference.getFullYear(), reference.getMonth(), reference.getDate());

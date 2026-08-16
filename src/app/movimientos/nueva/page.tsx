@@ -1,17 +1,21 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { requireUserId } from "@/lib/session";
 import { MovementForm } from "../MovementForm";
 import { createMovement } from "../actions";
 
 export const dynamic = "force-dynamic";
 
 export default async function NuevoMovimientoPage() {
+  const userId = await requireUserId();
   const [accounts, categories] = await Promise.all([
     prisma.account.findMany({
+      where: { userId },
       select: { id: true, name: true, accountNumber: true },
       orderBy: { name: "asc" },
     }),
     prisma.category.findMany({
+      where: { userId },
       select: { id: true, name: true, kind: true },
       orderBy: { name: "asc" },
     }),

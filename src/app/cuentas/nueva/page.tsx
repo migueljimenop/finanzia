@@ -1,8 +1,11 @@
 import Link from "next/link";
+import { requireUserId } from "@/lib/session";
 import { AccountForm } from "../AccountForm";
 import { createAccount } from "../actions";
 
-export default function NuevaCuentaPage() {
+export default async function NuevaCuentaPage() {
+  await requireUserId();
+
   return (
     <div className="flex flex-col gap-6">
       <div>

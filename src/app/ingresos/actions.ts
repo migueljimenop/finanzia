@@ -4,6 +4,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { requireUserId } from "@/lib/session";
 import { computeDistribution } from "@/lib/distribution";
 import { parseLocalDate } from "@/lib/date";
 
@@ -16,6 +17,7 @@ const incomeSchema = z.object({
 });
 
 export async function registerIncome(formData: FormData) {
+  const userId = await requireUserId();
   const data = incomeSchema.parse({
     accountId: formData.get("accountId"),
     ruleId: formData.get("ruleId"),
@@ -24,12 +26,13 @@ export async function registerIncome(formData: FormData) {
     description: formData.get("description"),
   });
 
-  const rule = await prisma.distributionRule.findUnique({
-    where: { id: data.ruleId },
+  const rule = await prisma.distributionRule.findFirst({
+    where: { id: data.ruleId, userId, isActive: true },
     include: { buckets: true },
   });
 
   if (!rule) throw new Error("Regla de distribución no encontrada");
+  if (data.amount <= 0) throw new Error("El monto debe ser mayor a 0");
 
   const distribution = computeDistribution(
     data.amount,
@@ -45,6 +48,7 @@ export async function registerIncome(formData: FormData) {
   await prisma.$transaction(async (tx) => {
     const income = await tx.income.create({
       data: {
+        userId,
         accountId: data.accountId,
         ruleId: data.ruleId,
         date: parseLocalDate(data.date),

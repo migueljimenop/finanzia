@@ -4,6 +4,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { requireUserId } from "@/lib/session";
 import { parseLocalDate } from "@/lib/date";
 import { TxType, TxSource } from "@/generated/prisma/client";
 
@@ -17,6 +18,7 @@ const movementSchema = z.object({
 });
 
 export async function createMovement(formData: FormData) {
+  const userId = await requireUserId();
   const data = movementSchema.parse({
     accountId: formData.get("accountId"),
     categoryId: formData.get("categoryId"),
@@ -28,6 +30,7 @@ export async function createMovement(formData: FormData) {
 
   await prisma.transaction.create({
     data: {
+      userId,
       accountId: data.accountId,
       categoryId: data.categoryId || null,
       type: data.type,
@@ -44,6 +47,7 @@ export async function createMovement(formData: FormData) {
 }
 
 export async function updateMovement(id: string, formData: FormData) {
+  const userId = await requireUserId();
   const data = movementSchema.parse({
     accountId: formData.get("accountId"),
     categoryId: formData.get("categoryId"),
@@ -53,8 +57,8 @@ export async function updateMovement(id: string, formData: FormData) {
     description: formData.get("description"),
   });
 
-  await prisma.transaction.update({
-    where: { id },
+  await prisma.transaction.updateMany({
+    where: { id, userId },
     data: {
       accountId: data.accountId,
       categoryId: data.categoryId || null,
@@ -71,7 +75,8 @@ export async function updateMovement(id: string, formData: FormData) {
 }
 
 export async function deleteMovement(id: string) {
-  await prisma.transaction.delete({ where: { id } });
+  const userId = await requireUserId();
+  await prisma.transaction.deleteMany({ where: { id, userId } });
   revalidatePath("/movimientos");
   revalidatePath("/");
 }

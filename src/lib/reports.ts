@@ -6,17 +6,18 @@ import {
 } from "@/lib/queries";
 import { REPORT_COMPARISON_MONTHS } from "@/lib/config";
 
-export async function getSpendByAccount(reference: Date = new Date()) {
+export async function getSpendByAccount(userId: string, reference: Date = new Date()) {
   const { start, end } = getMonthRange(reference);
-  return sumExpenseByAccount(start, end);
+  return sumExpenseByAccount(start, end, userId);
 }
 
-export async function getSpendByCategory(reference: Date = new Date()) {
+export async function getSpendByCategory(userId: string, reference: Date = new Date()) {
   const { start, end } = getMonthRange(reference);
-  return sumExpenseByCategoryWithNames(start, end);
+  return sumExpenseByCategoryWithNames(start, end, userId);
 }
 
 export async function getMonthlyComparison(
+  userId: string,
   reference: Date = new Date(),
   monthsBack = REPORT_COMPARISON_MONTHS
 ) {
@@ -28,7 +29,7 @@ export async function getMonthlyComparison(
 
     months.push({
       label: monthDate.toLocaleDateString("es-CL", { month: "short", year: "2-digit" }),
-      amount: await sumExpenseTotal(start, end),
+      amount: await sumExpenseTotal(start, end, userId),
     });
   }
 

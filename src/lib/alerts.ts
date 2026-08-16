@@ -36,6 +36,7 @@ const MIN_AMOUNT_TO_FLAG = ALERT_MIN_AMOUNT_TO_FLAG;
  * cuentas del margen (src/lib/config.ts).
  */
 export async function getAnthillReport(
+  userId: string,
   reference: Date = new Date(),
   monthsOfHistory = ALERT_MONTHS_OF_HISTORY
 ): Promise<AnthillReport> {
@@ -53,7 +54,7 @@ export async function getAnthillReport(
     999
   );
 
-  const currentByCategory = await sumExpenseByCategory(start, currentEnd);
+  const currentByCategory = await sumExpenseByCategory(start, currentEnd, userId);
 
   const historicalByMonth: Map<string | null, number>[] = [];
   for (let i = 1; i <= monthsOfHistory; i++) {
@@ -71,7 +72,7 @@ export async function getAnthillReport(
       999
     );
 
-    const monthTotals = await sumExpenseByCategory(monthStart, monthEnd);
+    const monthTotals = await sumExpenseByCategory(monthStart, monthEnd, userId);
     // Un mes sin ningún movimiento no cuenta como historial real, solo como
     // un mes calendario vacío.
     if (monthTotals.size > 0) historicalByMonth.push(monthTotals);
@@ -86,7 +87,7 @@ export async function getAnthillReport(
   ]);
 
   const categories = await prisma.category.findMany({
-    where: { id: { in: [...categoryIds].filter((id): id is string => id !== null) } },
+    where: { userId, id: { in: [...categoryIds].filter((id): id is string => id !== null) } },
   });
   const categoryNameById = new Map(categories.map((c) => [c.id, c.name]));
 

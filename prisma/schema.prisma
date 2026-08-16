@@ -43,8 +43,75 @@ enum TxSource {
   IMPORT
 }
 
+/// Cuenta/auth de Better Auth (tabla `account` renombrada para no chocar
+/// con el modelo de cuentas bancarias `Account`). Para email+password, la
+/// contraseña vive aquí (providerId = "credential").
+model AuthAccount {
+  id                    String    @id
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  idToken               String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  authAccounts     AuthAccount[]
+  sessions         Session[]
+  accounts         Account[]
+  categories       Category[]
+  transactions     Transaction[]
+  incomes          Income[]
+  distributionRules DistributionRule[]
+  documents        Document[]
+}
+
 model Account {
   id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name          String
   bank          Bank
   type          AccountType
@@ -56,21 +123,30 @@ model Account {
 
   transactions Transaction[]
   incomes      Income[]
+  documents    Document[]
 
-  @@unique([bank, accountNumber])
+  @@unique([userId, bank, accountNumber])
+  @@index([userId])
 }
 
 model Category {
   id       String @id @default(cuid())
-  name     String @unique
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name     String
   kind     TxType
   isSystem Boolean @default(false)
 
   transactions Transaction[]
+
+  @@unique([userId, name])
+  @@index([userId])
 }
 
 model Transaction {
   id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
   accountId   String
   account     Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
   date        DateTime
@@ -82,17 +158,22 @@ model Transaction {
   source      TxSource @default(MANUAL)
   createdAt   DateTime @default(now())
 
+  @@index([userId, date])
   @@index([accountId, date])
 }
 
 model DistributionRule {
   id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 
   buckets DistributionBucket[]
   incomes Income[]
+
+  @@index([userId])
 }
 
 model DistributionBucket {
@@ -110,6 +191,8 @@ model DistributionBucket {
 
 model Income {
   id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
   accountId   String
   account     Account  @relation(fields: [accountId], references: [id])
   date        DateTime
@@ -120,6 +203,8 @@ model Income {
   createdAt   DateTime @default(now())
 
   distributions IncomeDistribution[]
+
+  @@index([userId, date])
 }
 
 model IncomeDistribution {
@@ -132,4 +217,23 @@ model IncomeDistribution {
   amount   Decimal  @db.Decimal(14, 2)
 
   @@index([incomeId])
+}
+
+/// Cartola subida. `storedName` es la referencia al archivo guardado en
+/// disco (uploads/); pertenece a un usuario y opcionalmente a una cuenta.
+model Document {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId  String?
+  account    Account? @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  originalName String
+  storedName String   @unique
+  mime       String?
+  size       Int
+  bank       Bank?
+  rowCount   Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { requireUserId } from "@/lib/session";
 import { AccountForm } from "../../AccountForm";
 import { updateAccount } from "../../actions";
 
@@ -10,7 +11,8 @@ export default async function EditarCuentaPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const account = await prisma.account.findUnique({ where: { id } });
+  const userId = await requireUserId();
+  const account = await prisma.account.findFirst({ where: { id, userId } });
 
   if (!account) notFound();
 

@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { requireUserId } from "@/lib/session";
 import { formatCLP, BANK_LABELS, ACCOUNT_TYPE_LABELS } from "@/lib/format";
 import { DeleteAccountButton } from "./DeleteAccountButton";
 
 export const dynamic = "force-dynamic";
 
 export default async function CuentasPage() {
-  const accounts = await prisma.account.findMany({ orderBy: { createdAt: "asc" } });
+  const userId = await requireUserId();
+  const accounts = await prisma.account.findMany({ where: { userId }, orderBy: { createdAt: "asc" } });
 
   return (
     <div className="flex flex-col gap-6">
