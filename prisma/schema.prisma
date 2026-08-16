@@ -194,7 +194,7 @@ model Income {
   userId      String
   user        User     @relation(fields: [userId], references: [id])
   accountId   String
-  account     Account  @relation(fields: [accountId], references: [id])
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
   date        DateTime
   amount      Decimal  @db.Decimal(14, 2)
   description String?
