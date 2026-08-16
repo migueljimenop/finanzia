@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { Bank, TxType } from "@/generated/prisma/enums";
@@ -8,7 +8,7 @@ import { TX_TYPE_LABELS, accountLabel } from "@/lib/format";
 import { parseFlexibleDate, toDateInputValue } from "@/lib/date";
 import { parseFlexibleAmount } from "@/lib/csv";
 import { detectBankFormat, type BankParseResult, type SheetRow } from "@/lib/bank-parsers";
-import { importMovements } from "./actions";
+import { importMovements, uploadDocument } from "./actions";
 
 type Account = { id: string; name: string; bank: Bank; accountNumber?: string | null };
 type Category = { id: string; name: string; kind: TxType };
@@ -47,6 +47,7 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
   const [categoryId, setCategoryId] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const fileRef = useRef<File | null>(null);
 
   const [rows, setRows] = useState<SheetRow[]>([]);
   const [bankResult, setBankResult] = useState<BankParseResult | null>(null);
@@ -64,6 +65,7 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
   async function handleFile(file: File) {
     setError(null);
     setBankResult(null);
+    fileRef.current = file;
     try {
       const parsedRows = isSpreadsheet(file) ? await readSpreadsheet(file) : await readCsv(file);
       setRows(parsedRows);
@@ -115,6 +117,8 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
   const validRows = mappedRows.filter((r) => r.date && r.amount !== null);
   const invalidCount = mappedRows.length - validRows.length;
 
+  const readyCount = bankResult ? bankResult.movements.length : validRows.length;
+
   function handleImport() {
     setError(null);
     startTransition(async () => {
@@ -133,6 +137,23 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
               type,
             }));
 
+        // Persiste la cartola original (best-effort): si falla la escritura, el
+        // import de movimientos continúa igual. Hace falta antes de importMovements
+        // porque esa action redirige y corta la ejecución.
+        const file = fileRef.current;
+        if (file) {
+          try {
+            const fd = new FormData();
+            fd.append("file", file);
+            fd.append("accountId", accountId);
+            if (bankResult?.bank) fd.append("bank", bankResult.bank);
+            fd.append("rowCount", String(readyCount));
+            await uploadDocument(fd);
+          } catch {
+            // best-effort: no bloqueamos el import por un error al guardar la cartola.
+          }
+        }
+
         await importMovements({
           accountId,
           categoryId: categoryId || null,
@@ -145,8 +166,6 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
       }
     });
   }
-
-  const readyCount = bankResult ? bankResult.movements.length : validRows.length;
 
   return (
     <div className="flex flex-col gap-6">
