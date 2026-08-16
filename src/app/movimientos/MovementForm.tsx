@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { TxType } from "@/generated/prisma/enums";
-import { TX_TYPE_LABELS } from "@/lib/format";
+import { TX_TYPE_LABELS, accountLabel } from "@/lib/format";
 
-type Account = { id: string; name: string };
+type Account = { id: string; name: string; accountNumber?: string | null };
 type Category = { id: string; name: string; kind: TxType };
 
 type Props = {
@@ -55,7 +55,7 @@ export function MovementForm({ action, accounts, categories, defaultValues, subm
         >
           {accounts.map((account) => (
             <option key={account.id} value={account.id}>
-              {account.name}
+              {accountLabel(account)}
             </option>
           ))}
         </select>

@@ -1,6 +1,6 @@
 import { Bank, TxType } from "@/generated/prisma/enums";
 import type { BankParser, BankParseResult, ParsedMovement } from "./types";
-import { cellToString, findHeaderRow, parseCellAmount, parseCellDate } from "./utils";
+import { cellToString, findAccountNumber, findHeaderRow, parseCellAmount, parseCellDate } from "./utils";
 
 const ID = "banco_chile";
 const LABEL = "Banco de Chile (cuenta vista / FAN)";
@@ -22,6 +22,7 @@ export const bancoDeChileParser: BankParser = {
     if (!header) return null;
 
     const { rowIndex, columnIndex } = header;
+    const accountNumber = findAccountNumber(rows, /^cuenta:?$/i);
     const movements: ParsedMovement[] = [];
     let skippedRows = 0;
 
@@ -43,6 +44,13 @@ export const bancoDeChileParser: BankParser = {
       }
     }
 
-    return { bankId: ID, bankLabel: LABEL, bank: Bank.BANCO_CHILE, movements, skippedRows };
+    return {
+      bankId: ID,
+      bankLabel: LABEL,
+      bank: Bank.BANCO_CHILE,
+      accountNumber,
+      movements,
+      skippedRows,
+    };
   },
 };

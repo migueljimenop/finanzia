@@ -11,6 +11,11 @@ const accountSchema = z.object({
   bank: z.enum(Bank),
   type: z.enum(AccountType),
   balance: z.coerce.number().finite(),
+  accountNumber: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => v || null),
 });
 
 export async function createAccount(formData: FormData) {
@@ -19,6 +24,7 @@ export async function createAccount(formData: FormData) {
     bank: formData.get("bank"),
     type: formData.get("type"),
     balance: formData.get("balance"),
+    accountNumber: formData.get("accountNumber"),
   });
 
   await prisma.account.create({ data });
@@ -33,6 +39,7 @@ export async function updateAccount(id: string, formData: FormData) {
     bank: formData.get("bank"),
     type: formData.get("type"),
     balance: formData.get("balance"),
+    accountNumber: formData.get("accountNumber"),
   });
 
   await prisma.account.update({ where: { id }, data });

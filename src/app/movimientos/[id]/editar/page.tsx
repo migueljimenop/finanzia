@@ -13,7 +13,10 @@ export default async function EditarMovimientoPage({
   const { id } = await params;
   const [transaction, accounts, categories] = await Promise.all([
     prisma.transaction.findUnique({ where: { id } }),
-    prisma.account.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
+    prisma.account.findMany({
+      select: { id: true, name: true, accountNumber: true },
+      orderBy: { name: "asc" },
+    }),
     prisma.category.findMany({
       select: { id: true, name: true, kind: true },
       orderBy: { name: "asc" },

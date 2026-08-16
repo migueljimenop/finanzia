@@ -8,6 +8,7 @@ type Props = {
     bank: Bank;
     type: AccountType;
     balance: number;
+    accountNumber?: string | null;
   };
   submitLabel: string;
 };
@@ -56,6 +57,23 @@ export function AccountForm({ action, defaultValues, submitLabel }: Props) {
             </option>
           ))}
         </select>
+      </label>
+
+      <label className="flex flex-col gap-1">
+        <span className="text-sm font-medium">
+          Número de cuenta (opcional)
+        </span>
+        <input
+          name="accountNumber"
+          type="text"
+          defaultValue={defaultValues?.accountNumber ?? ""}
+          placeholder="Ej: 0-000-76-32920-6"
+          className="border rounded px-3 py-2"
+        />
+        <span className="text-xs text-neutral-500">
+          Sirve para distinguir varias cuentas del mismo banco al importar
+          cartolas — si el archivo trae el número, se detecta solo.
+        </span>
       </label>
 
       <label className="flex flex-col gap-1">

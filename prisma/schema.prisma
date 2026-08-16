@@ -44,17 +44,20 @@ enum TxSource {
 }
 
 model Account {
-  id        String   @id @default(cuid())
-  name      String
-  bank      Bank
-  type      AccountType
-  balance   Decimal     @default(0) @db.Decimal(14, 2)
-  currency  String      @default("CLP")
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id            String   @id @default(cuid())
+  name          String
+  bank          Bank
+  type          AccountType
+  accountNumber String?
+  balance       Decimal     @default(0) @db.Decimal(14, 2)
+  currency      String      @default("CLP")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 
   transactions Transaction[]
   incomes      Income[]
+
+  @@unique([bank, accountNumber])
 }
 
 model Category {

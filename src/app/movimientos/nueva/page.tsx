@@ -7,7 +7,10 @@ export const dynamic = "force-dynamic";
 
 export default async function NuevoMovimientoPage() {
   const [accounts, categories] = await Promise.all([
-    prisma.account.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
+    prisma.account.findMany({
+      select: { id: true, name: true, accountNumber: true },
+      orderBy: { name: "asc" },
+    }),
     prisma.category.findMany({
       select: { id: true, name: true, kind: true },
       orderBy: { name: "asc" },

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { formatCLP, BUCKET_TYPE_LABELS } from "@/lib/format";
+import { formatCLP, BUCKET_TYPE_LABELS, accountLabel } from "@/lib/format";
 import { registerIncome } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -42,7 +42,7 @@ export default async function IngresosPage() {
           >
             {accounts.map((account) => (
               <option key={account.id} value={account.id}>
-                {account.name}
+                {accountLabel(account)}
               </option>
             ))}
           </select>

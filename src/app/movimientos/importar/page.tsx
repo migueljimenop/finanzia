@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function ImportarMovimientosPage() {
   const [accounts, categories] = await Promise.all([
     prisma.account.findMany({
-      select: { id: true, name: true, bank: true },
+      select: { id: true, name: true, bank: true, accountNumber: true },
       orderBy: { name: "asc" },
     }),
     prisma.category.findMany({

@@ -33,6 +33,7 @@ export default async function EditarCuentaPage({
           bank: account.bank,
           type: account.type,
           balance: Number(account.balance),
+          accountNumber: account.accountNumber,
         }}
       />
     </div>

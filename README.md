@@ -19,6 +19,12 @@ Mercado Pago y Banco de Chile, automatizar la distribución del sueldo en
   - **Docker**: `docker compose up -d` (usa `docker-compose.yml`, puerto 5432)
   - **Sin Docker**: `npx prisma dev` levanta un Postgres local administrado por
     Prisma. Al iniciar imprime la `DATABASE_URL` a usar en `.env`.
+    > Nota: esta base de `prisma dev` comparte un solo esquema entre todos
+    > los nombres de base de datos (no aísla "bases de datos" como un
+    > Postgres real) y no soporta bien `prisma migrate dev` (falla el
+    > shadow database). Con Docker no pasa esto — úsalo si tienes problemas
+    > al migrar. Con `prisma dev`, aplica cambios de schema con
+    > `prisma db push` en vez de `migrate dev`.
 
 ## Setup
 
@@ -39,7 +45,8 @@ gasto por defecto y una regla de distribución de ejemplo.
 
 Definido en [`prisma/schema.prisma`](prisma/schema.prisma):
 
-- **Account**: cada banco/tarjeta, con saldo y tipo (débito/crédito).
+- **Account**: cada banco/tarjeta, con saldo, tipo (débito/crédito) y N° de
+  cuenta opcional (para distinguir varias cuentas del mismo banco).
 - **Category**: categorías de gasto/ingreso.
 - **Transaction**: movimientos por cuenta (manual o importado; la importación
   se construye en la Etapa 2).
@@ -104,13 +111,21 @@ configurados, seed y CI de lint/build.
   - Si el archivo no calza con ninguno de los tres formatos, cae a un
     **mapeo manual** de columnas (fecha/monto/descripción) para CSVs
     genéricos, igual que antes
-  - La cuenta destino se preselecciona según el banco detectado
+  - La cuenta destino se preselecciona según el banco **y N° de cuenta**
+    detectado en el archivo (ver más abajo) — si no hay match, no adivina:
+    avisa y deja que elijas tú
 - Los movimientos importados o manuales alimentan directamente el cálculo
   de margen de la Etapa 1
 - El parser XLSX (`xlsx`/SheetJS) se instaló desde el CDN oficial de
   SheetJS en vez de npm — la versión publicada en el registro npm
   (0.18.5) tiene CVEs sin parchear ahí; SheetJS solo publica versiones
   parchadas en su propio CDN
+- **N° de cuenta opcional en `Account`**: para distinguir varias cuentas
+  del mismo banco (ej. dos cuentas Santander). Si el archivo importado
+  trae el número (Santander y Banco de Chile lo traen en su metadata;
+  Falabella no lo trae en las cartolas de tarjeta de crédito), se usa
+  para elegir automáticamente la cuenta correcta en vez de la primera del
+  mismo banco
 
 ### Falta para las próximas etapas
 - **Etapa 3 — Reportes**: vistas por banco, tarjeta y categoría, mensual y
