@@ -1,6 +1,6 @@
 import { Bank, TxType } from "@/generated/prisma/enums";
 import type { BankParser, BankParseResult, ParsedMovement } from "./types";
-import { cellToString, findHeaderRow, parseCellAmount, parseCellDate } from "./utils";
+import { cellToString, findAccountNumber, findHeaderRow, parseCellAmount, parseCellDate } from "./utils";
 
 const ID = "falabella";
 const LABEL = "Falabella (tarjeta de crédito)";
@@ -22,6 +22,8 @@ export const falabellaParser: BankParser = {
     if (!header) return null;
 
     const { rowIndex, columnIndex } = header;
+    // No siempre viene en la cartola; si aparece suele ser como "N° Tarjeta" o similar.
+    const accountNumber = findAccountNumber(rows, /n[uú]mero\s*(?:de)?\s*tarjeta|tarjeta\s*n[uú]mero/i);
     const movements: ParsedMovement[] = [];
     let skippedRows = 0;
 
@@ -47,6 +49,13 @@ export const falabellaParser: BankParser = {
       });
     }
 
-    return { bankId: ID, bankLabel: LABEL, bank: Bank.FALABELLA, movements, skippedRows };
+    return {
+      bankId: ID,
+      bankLabel: LABEL,
+      bank: Bank.FALABELLA,
+      accountNumber,
+      movements,
+      skippedRows,
+    };
   },
 };

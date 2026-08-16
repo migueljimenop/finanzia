@@ -4,13 +4,13 @@ import { useMemo, useState, useTransition } from "react";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { Bank, TxType } from "@/generated/prisma/enums";
-import { TX_TYPE_LABELS } from "@/lib/format";
+import { TX_TYPE_LABELS, accountLabel } from "@/lib/format";
 import { parseFlexibleDate, toDateInputValue } from "@/lib/date";
 import { parseFlexibleAmount } from "@/lib/csv";
 import { detectBankFormat, type BankParseResult, type SheetRow } from "@/lib/bank-parsers";
 import { importMovements } from "./actions";
 
-type Account = { id: string; name: string; bank: Bank };
+type Account = { id: string; name: string; bank: Bank; accountNumber?: string | null };
 type Category = { id: string; name: string; kind: TxType };
 
 type MappedRow = {
@@ -71,7 +71,13 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
       const detected = detectBankFormat(parsedRows);
       if (detected) {
         setBankResult(detected);
-        const preselected = accounts.find((a) => a.bank === detected.bank);
+        const sameBankAccounts = accounts.filter((a) => a.bank === detected.bank);
+        const exactMatch = detected.accountNumber
+          ? sameBankAccounts.find((a) => a.accountNumber === detected.accountNumber)
+          : undefined;
+        // Si el archivo trae número de cuenta pero ninguna cuenta existente calza,
+        // no adivinamos: puede haber más de una cuenta del mismo banco.
+        const preselected = exactMatch ?? (detected.accountNumber ? undefined : sameBankAccounts[0]);
         if (preselected) setAccountId(preselected.id);
         return;
       }
@@ -167,7 +173,7 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
           >
             {accounts.map((account) => (
               <option key={account.id} value={account.id}>
-                {account.name}
+                {accountLabel(account)}
               </option>
             ))}
           </select>
@@ -213,10 +219,21 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       {bankResult && (
-        <p className="text-sm text-green-700 dark:text-green-500">
-          Formato reconocido: {bankResult.bankLabel}. Fecha, monto y tipo (gasto,
-          ingreso o transferencia) de cada fila se detectaron automáticamente.
-        </p>
+        <div className="flex flex-col gap-1">
+          <p className="text-sm text-green-700 dark:text-green-500">
+            Formato reconocido: {bankResult.bankLabel}. Fecha, monto y tipo (gasto,
+            ingreso o transferencia) de cada fila se detectaron automáticamente.
+          </p>
+          {bankResult.accountNumber && (
+            <p className="text-sm text-neutral-500">
+              N° de cuenta detectado en el archivo: {bankResult.accountNumber}
+              {!accounts.some(
+                (a) => a.bank === bankResult.bank && a.accountNumber === bankResult.accountNumber
+              ) &&
+                " — ninguna cuenta registrada tiene este número, revisa que hayas elegido la correcta o créala en Cuentas."}
+            </p>
+          )}
+        </div>
       )}
 
       {!bankResult && headers.length > 0 && (

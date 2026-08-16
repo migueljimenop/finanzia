@@ -43,3 +43,8 @@ export const TX_SOURCE_LABELS: Record<string, string> = {
   MANUAL: "Manual",
   IMPORT: "Importado",
 };
+
+/** Nombre + número de cuenta (si existe), para distinguir cuentas del mismo banco. */
+export function accountLabel(account: { name: string; accountNumber?: string | null }): string {
+  return account.accountNumber ? `${account.name} (${account.accountNumber})` : account.name;
+}

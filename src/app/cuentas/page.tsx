@@ -26,6 +26,7 @@ export default async function CuentasPage() {
             <tr>
               <th className="px-4 py-2">Nombre</th>
               <th className="px-4 py-2">Banco</th>
+              <th className="px-4 py-2">N° de cuenta</th>
               <th className="px-4 py-2">Tipo</th>
               <th className="px-4 py-2 text-right">Saldo</th>
               <th className="px-4 py-2"></th>
@@ -36,6 +37,7 @@ export default async function CuentasPage() {
               <tr key={account.id} className="border-t">
                 <td className="px-4 py-2">{account.name}</td>
                 <td className="px-4 py-2">{BANK_LABELS[account.bank]}</td>
+                <td className="px-4 py-2 text-neutral-500">{account.accountNumber ?? "—"}</td>
                 <td className="px-4 py-2">{ACCOUNT_TYPE_LABELS[account.type]}</td>
                 <td className="px-4 py-2 text-right">{formatCLP(account.balance)}</td>
                 <td className="px-4 py-2">
@@ -53,7 +55,7 @@ export default async function CuentasPage() {
             ))}
             {accounts.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-neutral-500">
+                <td colSpan={6} className="px-4 py-6 text-center text-neutral-500">
                   No hay cuentas registradas todavía.
                 </td>
               </tr>

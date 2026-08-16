@@ -15,6 +15,8 @@ export type BankParseResult = {
   bankLabel: string;
   /** Banco del enum de Prisma, para preseleccionar la cuenta destino. */
   bank: Bank;
+  /** N° de cuenta/tarjeta si el archivo lo trae en su metadata, si no null. */
+  accountNumber: string | null;
   movements: ParsedMovement[];
   /** Filas dentro de la tabla detectada que no se pudieron interpretar. */
   skippedRows: number;
