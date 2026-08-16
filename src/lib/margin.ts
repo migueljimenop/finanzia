@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { AccountType, Bank, BucketType, TxType } from "@/generated/prisma/client";
+import { BucketType } from "@/generated/prisma/client";
+import { sumExpenseTotal } from "@/lib/queries";
 
 export function getMonthRange(reference: Date) {
   const start = new Date(reference.getFullYear(), reference.getMonth(), 1);
@@ -15,11 +16,10 @@ function getDaysRemaining(reference: Date, monthEnd: Date) {
 }
 
 /**
- * Cuentas débito cuyo gasto sale del margen disponible. Mercado Pago queda
- * fuera porque ese dinero ya está asignado al sobre "hogar" al momento de
- * la distribución del sueldo.
+ * Cuentas cuyo gasto sale del margen disponible, el forecast y las alertas.
+ * Definidas en src/lib/config.ts (incluye débito Santander/Banco de Chile y
+ * la tarjeta Falabella; Mercado Pago queda fuera).
  */
-const MARGIN_DEBIT_BANKS: Bank[] = [Bank.SANTANDER, Bank.BANCO_CHILE];
 
 export async function getMarginSummary(reference: Date = new Date()) {
   const { start, end } = getMonthRange(reference);
@@ -32,17 +32,9 @@ export async function getMarginSummary(reference: Date = new Date()) {
     },
   });
 
-  const spentAgg = await prisma.transaction.aggregate({
-    _sum: { amount: true },
-    where: {
-      type: TxType.EXPENSE,
-      date: { gte: start, lte: end },
-      account: { bank: { in: MARGIN_DEBIT_BANKS }, type: AccountType.DEBIT },
-    },
-  });
+  const spent = await sumExpenseTotal(start, end);
 
   const monthlyMargin = Number(marginAgg._sum.amount ?? 0);
-  const spent = Number(spentAgg._sum.amount ?? 0);
   const remaining = monthlyMargin - spent;
   const daysRemaining = getDaysRemaining(reference, end);
   const dailyAvailable = remaining / daysRemaining;

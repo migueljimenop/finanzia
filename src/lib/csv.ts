@@ -10,6 +10,8 @@ export function parseFlexibleAmount(value: string): number | null {
   if (!trimmed) return null;
 
   const digitsOnly = trimmed.replace(/-/g, "");
+  if (!digitsOnly) return null;
+
   const separators = digitsOnly.match(/[.,]/g) ?? [];
 
   let normalized: string;

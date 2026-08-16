@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getSpendByAccount, getSpendByCategory, getMonthlyComparison } from "@/lib/reports";
 import { parseMonthParam, toMonthParam } from "@/lib/date";
 import { BANK_LABELS, formatCLP } from "@/lib/format";
+import { Bank } from "@/generated/prisma/enums";
 import { BarList } from "./BarList";
 
 export const dynamic = "force-dynamic";
@@ -51,7 +52,7 @@ export default async function ReportesPage({
           items={byAccount.map((a) => ({
             label: `${a.accountName}${a.bank ? ` (${BANK_LABELS[a.bank]})` : ""}`,
             amount: a.amount,
-            highlight: a.bank === "FALABELLA",
+            highlight: a.bank === Bank.FALABELLA,
           }))}
           emptyLabel="Sin gastos registrados este mes."
         />
