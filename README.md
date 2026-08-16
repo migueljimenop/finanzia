@@ -132,10 +132,22 @@ configurados, seed y CI de lint/build.
   destacada, por ser "la tarjeta que trato de no usar"), por categoría, y
   comparativo de los últimos 6 meses, con navegación mes a mes
 
+### Etapa 4 — Forecast y alertas ✅
+- Forecast de cierre de mes en el dashboard ([`src/lib/forecast.ts`](src/lib/forecast.ts)):
+  proyecta el gasto a fin de mes extrapolando el ritmo actual (gasto
+  acumulado / días transcurridos) y lo compara contra el margen mensual
+- Alertas de gasto hormiga ([`src/lib/alerts.ts`](src/lib/alerts.ts)):
+  compara el gasto acumulado del mes por categoría (y el total) contra el
+  promedio de esos mismos días en los 3 meses anteriores; marca alerta
+  cuando la desviación supera 20%. Necesita al menos 2 meses de
+  historial real (con movimientos) para activarse — antes de eso muestra
+  un aviso en vez de una alerta falsa
+
 ### Falta para las próximas etapas
-- **Etapa 4 — Forecast y alertas**: proyección de cierre de mes y alertas
-  de gasto hormiga cuando el acumulado se desvía del promedio histórico
 - Gestión de reglas de distribución desde la UI (hoy solo existe la regla
   sembrada por el seed; para cambiarla hay que editar la base directamente)
 - Categorización automática de movimientos importados (hoy queda "sin
-  categoría" salvo que elijas una para todo el lote al importar)
+  categoría" salvo que elijas una para todo el lote al importar) — queda
+  pendiente para después de esto, según lo conversado
+- PWA / app móvil, integración bancaria real (Open Banking), multiusuario
+  — fuera de alcance de v1 según el plan de producto original
