@@ -12,8 +12,8 @@ fin de mes.
   Pago, …) con saldo, tipo (débito/crédito) y N° de cuenta para distinguir varias
   del mismo banco.
 - **Distribución del sueldo en sobres** al registrar un ingreso: inversión, hogar,
-  cuota de crédito y margen disponible, con método de cálculo configurable
-  (porcentaje, monto fijo o resto).
+  cuota de crédito y margen disponible (siempre el resto), con método de cálculo
+  configurable (porcentaje o monto fijo) editable en `/regla`.
 - **Movimientos**: registro manual o **importación de cartolas** en CSV/XLS/XLSX.
   Detecta automáticamente el formato de Santander, Banco de Chile y Falabella
   (parsers dedicados), y guarda la cartola original en disco.
@@ -59,10 +59,29 @@ pnpm dev
 
 La app queda en `http://localhost:3000`. Al abrirla, crea tu cuenta desde
 `/login` (sign-up). El seed crea un usuario `demo@finanzia.app` con cuentas,
-categorías y una regla de distribución de ejemplo.
+categorías y una regla de distribución de ejemplo — no tiene contraseña
+asignada, así que no sirve para iniciar sesión, solo como datos de referencia.
 
 > **Autenticación**: las páginas privadas exigen sesión y redirigen a `/login`.
 > Sin `BETTER_AUTH_SECRET` el login no funciona.
+
+### Onboarding de un usuario nuevo
+
+Al registrarte no partes de cero, pero tampoco todo viene precargado:
+
+- Las **categorías de gasto por defecto** se crean automáticamente la primera
+  vez que cargas cualquier página (`ensureDefaultCategories` en
+  [`src/lib/onboarding.ts`](src/lib/onboarding.ts), llamado desde
+  `requireUserId`). Es idempotente y también corrige retroactivamente a
+  cuentas que quedaron vacías.
+- Las **cuentas bancarias** las creas tú en `/cuentas` — son específicas de
+  cada persona, no tiene sentido inventarlas.
+- La **regla de distribución** la creas en `/regla` — los porcentajes y montos
+  son una decisión financiera personal, así que tampoco se auto-genera con
+  valores de ejemplo (podría inducir a error si alguien los deja sin revisar).
+  Sin una regla activa no puedes registrar ingresos.
+- El dashboard muestra una tarjeta **"Primeros pasos"** mientras falte alguna
+  cuenta o la regla; desaparece sola cuando ambas existen.
 
 ## Modelo de datos
 
@@ -114,4 +133,20 @@ npx prisma db seed    # datos de ejemplo
   npm (`0.18.5`) tiene CVEs sin parchear; SheetJS solo publica versiones
   corregidas en su propio CDN.
 - Los archivos de cartolas importados se guardan en `uploads/` (en `.gitignore`,
-  no servido).
+  no servido). Esto no sobrevive en hosting serverless/efímero (ej. Vercel) —
+  si se despliega ahí, hay que mover esto a un storage externo (S3, R2, etc.)
+  antes.
+- `BETTER_AUTH_URL` y `NEXT_PUBLIC_APP_URL` deben coincidir con el puerto real
+  en el que corre el server — si no, el login falla con `ERR_CONNECTION_REFUSED`
+  sin mensaje claro. Común al correr en un puerto distinto al de `.env`.
+- Gaps conocidos, pendientes de una próxima pasada:
+  - `accountId`/`categoryId` que llegan de formularios (`registerIncome`,
+    `createMovement`, `updateMovement`, `importMovements`, `uploadDocument`) no
+    se verifican contra `userId` antes de usarse — el resto de la app sí valida
+    ownership consistentemente. Bajo riesgo (ids son cuids no adivinables) pero
+    es el antipatrón que la propia guía de seguridad de Next.js pide evitar.
+  - `Income.userId` no tiene `onDelete: Cascade` (a diferencia de Account,
+    Category, Transaction y DistributionRule) — borrar un `User` con ingresos
+    falla por FK a menos que se borren los ingresos primero.
+  - El registro público está abierto sin restricción alguna.
+  - CI solo corre `lint` + `build`, no `pnpm test`.

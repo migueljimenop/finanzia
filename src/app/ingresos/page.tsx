@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/session";
 import { formatCLP, BUCKET_TYPE_LABELS, accountLabel } from "@/lib/format";
@@ -57,7 +58,11 @@ export default async function IngresosPage() {
           </select>
           {rules.length === 0 && (
             <span className="text-sm text-[var(--status-critical)]">
-              No hay reglas de distribución activas.
+              No hay reglas de distribución activas —{" "}
+              <Link href="/regla" className="underline">
+                créala aquí
+              </Link>
+              .
             </span>
           )}
         </label>
